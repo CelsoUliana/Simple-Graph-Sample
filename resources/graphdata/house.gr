@@ -1,0 +1,12 @@
+G U 5 6 Casa
+N 0 0 I1
+N 1 0 I2
+N 2 0 I3
+N 3 0 I4
+N 4 0 I5
+E 0 1 0 P1
+E 1 2 0 P2
+E 2 3 0 P3
+E 3 4 0 P4
+E 4 0 0 P5
+E 1 4 0 Teto

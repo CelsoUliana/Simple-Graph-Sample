@@ -1,0 +1,10 @@
+digraph G {
+   graph[bgcolor=aquamarine3]
+   graph[label = "Teste para aula", labelloc=t, fontsize=12, fontcolor=khaki1]
+   node [fontsize=10]
+
+  Rest [shape=record, label="{<b0>Restaurante|Nome|Endereço|<b1>Tipo|{$|<b2>$$|$$$}}", fontcolor=firebrick, color=blue, style=bold];
+  Banco [shape=polygon, sides=6, distortion=0.5, skew = -0.3];
+
+  Rest:b1:e -> Banco [color=red, style=bold];
+}

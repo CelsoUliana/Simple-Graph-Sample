@@ -1,0 +1,26 @@
+G U 10 15 Petersen
+N 0 0 I1
+N 1 0 I2
+N 2 0 I3
+N 3 0 I4
+N 4 0 I5
+N 5 0 O1
+N 6 0 O2
+N 7 0 O3
+N 8 0 O4
+N 9 0 O5
+E 0 1 0 P1
+E 1 2 0 P2
+E 2 3 0 P3
+E 3 4 0 P4
+E 4 0 0 P5
+E 5 7 0 S1
+E 7 9 0 S2
+E 9 6 0 S3
+E 6 8 0 S4
+E 8 5 0 S5
+E 0 5 0 C1
+E 1 6 0 C2
+E 2 7 0 C3
+E 3 8 0 C4
+E 4 9 0 C5

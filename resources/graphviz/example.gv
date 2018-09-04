@@ -1,0 +1,22 @@
+digraph G {
+   graph[bgcolor=lightblue]
+   graph[label = "Teste para aula", labelloc=t, fontsize=12];
+   node [fontsize=10];
+
+
+//   node "Welcome" [shape=polygon, sides=6, color=blue, style=bold]
+  "Welcome" [shape=polygon, sides=6, color=blue, style=bold]
+
+  "Welcome" -> "To" [color=green, style=dashed];
+  "To" [shape=polygon, sides=6, distortion=0.5, skew = -0.3]
+  "To" -> "Web" [style=bold]
+  "Web" [fontcolor=red, color=salmon, style=filled]
+  "To" -> "GraphViz!" [headport=ne, arrowhead=ediamond, arrowtail=tee, dir=both]
+  "GraphViz!" [shape=box, style="roundend,filled", color=red, fillcolor="green"]
+
+  "Welcome" -> "Web" [style=invis] // Hiden
+
+  "Here lies\la node"
+  "A node with" -> {"Neighbour 1", "Neighbour 2" }
+  "Not here"[style=invis]
+}

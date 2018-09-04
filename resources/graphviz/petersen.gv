@@ -1,0 +1,18 @@
+graph Petersen {
+   graph [label="Teste para aula", labelloc=t, fontsize=12, fontcolor=red, layout=circo]
+   node [fontsize=10]
+
+   O1 -- O2 -- O3 -- O4 -- O5 -- O1;
+   I1 -- I3 -- I5 -- I2 -- I4 -- I1;
+  
+# {rank=same; O1 ; O2 ; O3 ; O4 ; O5 }
+#  {rank=same; I1 ; I2 ; I3 ; I4 ; I5 }
+#  I1 -- I3 -- I5 -- I2 -- I4 -- I1;
+
+  I1 -- O1;
+  I2 -- O2;
+  I3 -- O3;
+  I4 -- O4;
+  I5 -- O5;
+  
+}
