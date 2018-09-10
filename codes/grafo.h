@@ -5,41 +5,41 @@ typedef int TId;
 typedef double TPeso;
 
 struct SAresta {
-  TId destino;
-  TPeso peso;
-  char *rotulo;
+    TId destino;
+    TPeso peso;
+    char *rotulo;
 };
 
 typedef struct SAresta TAresta;
 
 struct ListaAdj {
-  struct ListaAdj *prox;
-  TAresta aresta;
+    struct ListaAdj *prox;
+    TAresta aresta;
 };
 
 typedef struct ListaAdj TNoLista;
 
 struct SVertice {
-  TId grauSaida;
-  TId grauEntrada;
-  TPeso peso;
-  char *rotulo;
+    TId grauSaida;
+    TId grauEntrada;
+    TPeso peso;
+    char *rotulo;
   // Para grafos não orientados, a primeira lista abaixo contém todos os 
   // vizinhos e a segunda lista é vazia.
   // Arestas saindo do vértice, se direcionado.
-  TNoLista *direto;
+    TNoLista *direto;
   // Arestas chegando no vértice, se direcionado.
-  TNoLista *reverso;
+    TNoLista *reverso;
 };
 
 typedef struct SVertice TVertice;
 
 struct SGrafo {
-  int direcionado;
-  TId n;
-  TId m;
-  char *nome;
-  TVertice *vertices;
+    int direcionado;
+    TId n;
+    TId m;
+    char *nome;
+    TVertice *vertices;
 };
 
 typedef struct SGrafo TGrafo;
@@ -51,7 +51,7 @@ int init_graph(TGrafo *g, TId n, TId m, int direcionado);
 int finaliza_grafo(TGrafo *g);
 
 // Cria um grafo para conter n vértices e m arestas.
-TGrafo * create_graph(TId n, TId m, int direcionado);
+TGrafo * cria_grafo(TId n, TId m, int direcionado);
 
 // Desaloca todo o grafo, inclusive a estrutura principal.
 void destroi_grafo(TGrafo *g);

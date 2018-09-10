@@ -6,41 +6,41 @@ int init_graph(TGrafo *g, TId n, TId m, int direcionado) {
 
     g -> vertices = (TVertice *) malloc (sizeof(TVertice[n]));
 
-      if (g -> vertices == NULL)
+    if (g -> vertices == NULL)
         return 0;
-      g -> n = n;
-      g -> m = 0;
-      g -> direcionado = direcionado;
-      g -> nome = NULL;
+    g -> n = n;
+    g -> m = 0;
+    g -> direcionado = direcionado;
+    g -> nome = NULL;
 
-      int i;
-      for (i = 0; i < n; i++) {
+    int i;
+    for (i = 0; i < n; i++) {
         g -> vertices[i].rotulo = NULL;
         g -> vertices[i].direto = NULL;
         g -> vertices[i].reverso = NULL;
         g -> vertices[i].grauEntrada = 0;
         g -> vertices[i].grauSaida = 0;
         g -> vertices[i].peso = 0.0;
-      }
+    }
 
-      return 1;
+    return 1;
 }
 
 // Inicializa um grafo para conter n vértices e m arestas.
 TGrafo * create_graph(TId n, TId m, int direcionado) {
 
-      TGrafo * g = (TGrafo *) malloc (sizeof(TGrafo));
+    TGrafo * g = (TGrafo *) malloc (sizeof(TGrafo));
 
-      if (g == NULL)
+    if (g == NULL)
         return NULL;
 
-      if (init_graph(g, n, m, direcionado))
+    if (init_graph(g, n, m, direcionado))
         return g;
 
-      else {
+    else {
         free(g);
         return NULL;
-      }
+    }
 }
 
 // Função auxiliar para liberar listas ligadas
@@ -66,26 +66,27 @@ int finaliza_grafo(TGrafo *g) {
     for (i = 0; i < g -> n; i++) {
         finaliza_lista(g -> vertices[i].direto);
         finaliza_lista(g -> vertices[i].reverso);
-      }
+    }
 
 }
 
 // Desaloca todo o grafo, inclusive a estrutura principal.
 void destroi_grafo(TGrafo *g) {
-  finaliza_grafo(g);
-  free(g);
+    finaliza_grafo(g);
+    free(g -> vertices);
+    free(g);
 }
 
 const char *getNome(const TGrafo *g) {
-  return g -> nome;
+    return g -> nome;
 }
 
 TId contaVertices(const TGrafo *g) {
-  return g -> n;
+    return g -> n;
 }
 
 TId contaArestas(const TGrafo *g) {
-  return g -> m;
+    return g -> m;
 }
 
 /* SUA IMPLEMENTAÇÃO A PARTIR DAQUI */ 
@@ -158,7 +159,7 @@ int desconectar(TGrafo *g, TId u, TId v){
 
 // Conecta dois vértices por uma aresta
 const TAresta * conectar(TGrafo *g, TId u, TId v) {
-  return conectarPeso(g, u, v, 0, "");
+    return conectarPeso(g, u, v, 0, "");
 }
 
 // Conecta dois vértices por uma aresta com peso.
@@ -198,33 +199,33 @@ const TAresta * alteraPeso(TGrafo *g, TId u, TId v, TPeso peso, char *rotulo){
 
 void print_graph(Tgrafo *g){
 
-  printf("Inicio do grafo:\n");
-  printf("nome do grafo: %s\n", g -> nome);
-  printf("quantidade de vertices: %d\n", g -> n);
-  printf("quantidade de arestas: %d\n", g -> m);
-  printf("direcionado: %d\n", g -> direcionado);
+    printf("Inicio do grafo:\n");
+    printf("nome do grafo: %s\n", g -> nome);
+    printf("quantidade de vertices: %d\n", g -> n);
+    printf("quantidade de arestas: %d\n", g -> m);
+    printf("direcionado: %d\n", g -> direcionado);
 
-  int i;
-  for (i = 0; i < g -> n; i++) {
-    printf("vertice: %d\n", i);
-    printf("rotudo: %s\n", g -> vertices[i].rotudo);
-    printf("grau saida: %d\n", g -> vertices[i].grauSaida);
-    printf("grau entrada: %d\n", g -> vertices[i].grauEntrada);
-    printf("peso: %lf\n", g -> vertices[i].peso);
-    printf("Lista de arestas direta: \n");
+    int i;
+    for (i = 0; i < g -> n; i++) {
+        printf("vertice: %d\n", i);
+        printf("rotudo: %s\n", g -> vertices[i].rotudo);
+        printf("grau saida: %d\n", g -> vertices[i].grauSaida);
+        printf("grau entrada: %d\n", g -> vertices[i].grauEntrada);
+        printf("peso: %lf\n", g -> vertices[i].peso);
+        printf("Lista de arestas direta: \n");
 
-    TNoLista *cur = vertices[i].direto;
+        TNoLista *cur = vertices[i].direto;
 
-    printf("nome aresta: %s\n", cur -> aresta.rotulo);
-    printf("peso aresta: %lf", cur -> aresta.peso);
-    printf("sai de %d e vai a %d\n", i, cur -> aresta.destino);
+        printf("nome aresta: %s\n", cur -> aresta.rotulo);
+        printf("peso aresta: %lf", cur -> aresta.peso);
+        printf("sai de %d e vai a %d\n", i, cur -> aresta.destino);
 
-    cur = vertices[i].reverso;
+        cur = vertices[i].reverso;
 
-    printf("Lista de arestas reverso: \n");
+        printf("Lista de arestas reverso: \n");
 
-    printf("nome aresta: %s\n", cur -> aresta.rotulo);
-    printf("peso aresta: %lf", cur -> aresta.peso);
-    printf("sai de %d e vai a %d\n", i, cur -> aresta.destino);
-  }
+        printf("nome aresta: %s\n", cur -> aresta.rotulo);
+        printf("peso aresta: %lf", cur -> aresta.peso);
+        printf("sai de %d e vai a %d\n", i, cur -> aresta.destino);
+    }
 }
