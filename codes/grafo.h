@@ -45,13 +45,13 @@ struct SGrafo {
 typedef struct SGrafo TGrafo;
 
 // Inicializa um grafo para conter n vértices e m arestas.
-int inicializa_grafo(TGrafo *g, TId n, TId m, int direcionado);
+int init_graph(TGrafo *g, TId n, TId m, int direcionado);
 
 // Desaloca todas as estruturas relacionadas ao grafo.
 int finaliza_grafo(TGrafo *g);
 
 // Cria um grafo para conter n vértices e m arestas.
-TGrafo * cria_grafo(TId n, TId m, int direcionado);
+TGrafo * create_graph(TId n, TId m, int direcionado);
 
 // Desaloca todo o grafo, inclusive a estrutura principal.
 void destroi_grafo(TGrafo *g);
