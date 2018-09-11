@@ -70,7 +70,7 @@ TId grauEntradaVertice(const TGrafo *g, TId u);
 
 // Verifica se u, v é uma aresta no grafo e retona sua referência, se 
 // encontrada, ou NULL caso contrário.
-const TAresta * aresta(const TGrafo *g, TId u, TId v);
+TNoLista * aresta(const TGrafo *g, TId u, TId v);
 
 // Remove uma aresta do grafo. Retorna falso se a aresta não foi encontrada.
 int desconectar(TGrafo *g, TId u, TId v);
@@ -83,6 +83,6 @@ const TAresta * conectar(TGrafo *g, TId u, TId v);
 const TAresta * conectarPeso(TGrafo *g, TId u, TId v, TPeso peso, char *rotulo);
 
 // Altera o peso de uma aresta existente. Retorna NULL se não houver aresta.
-const TAresta * alteraPeso(TGrafo *g, TId u, TId v, TPeso peso, char *rotulo);
+TAresta * alteraPeso(TGrafo *g, TId u, TId v, TPeso peso, char *rotulo);
 
 #endif
