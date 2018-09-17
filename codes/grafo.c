@@ -3,16 +3,17 @@
 #include "grafo.h"
 
 // Inicializa um grafo para conter n vértices
-int init_graph(TGrafo *g, TId n, TId m, int direcionado) {
+int init_graph(TGrafo *g, TId n, char *nome, int direcionado) {
 
     g -> vertices = (TVertice *) malloc (sizeof(TVertice[n]));
 
     if (g -> vertices == NULL)
         return 0;
+        
     g -> n = n;
     g -> m = 0;
     g -> direcionado = direcionado;
-    g -> nome = NULL;
+    g -> nome = nome;
 
     int i;
     for (i = 0; i < n; i++) {
@@ -27,15 +28,27 @@ int init_graph(TGrafo *g, TId n, TId m, int direcionado) {
     return 1;
 }
 
+// funcao preencher
+void fill(TNoLista *cur, TId destino, TPeso peso, char *rotulo){
+    cur -> aresta.destino = destino;
+    cur -> aresta.rotulo = rotulo;
+    cur -> aresta.peso = peso;
+}
+
+//grafo sem vértices ou fora do limite?
+int is_invalid(const TGrafo *g, TId v, TId u){
+    return g -> n == 0 || g -> vertices == NULL || v >= g -> n || u >= g -> n;
+}
+
 // Inicializa um grafo para conter n vértices
-TGrafo * create_graph(TId n, TId m, int direcionado) {
+TGrafo * create_graph(TId n, char* nome, int direcionado) {
 
     TGrafo * g = (TGrafo *) malloc (sizeof(TGrafo));
 
     if (g == NULL)
         return NULL;
 
-    if (init_graph(g, n, m, direcionado))
+    if (init_graph(g, n, nome, direcionado))
         return g;
 
     else {
@@ -101,11 +114,6 @@ TId contaArestas(const TGrafo *g) {
 
 /* SUA IMPLEMENTAÇÃO A PARTIR DAQUI */ 
 
-// Retorna grau entrada + grau saida
-TId grauVertice(const TGrafo *g, TId u){
-    return grauSaidaVertice(g, u) + grauEntradaVertice(g, u);
-}
-
 TId grauSaidaVertice(const TGrafo *g, TId u){
     return g -> vertices[u].grauSaida;
 }
@@ -114,56 +122,69 @@ TId grauEntradaVertice(const TGrafo *g, TId u){
     return g -> vertices[u].grauEntrada;
 }
 
+// Retorna grau entrada + grau saida
+TId grauVertice(const TGrafo *g, TId u){
+    return grauSaidaVertice(g, u) + grauEntradaVertice(g, u);
+}
+
 // Verifica se u, v é uma aresta no grafo e retona sua referência, se 
 // encontrada, ou NULL caso contrário.
 // Retorna a referencia ao nó antigo.
-// Caso direcionado, a ordem importa(original) caso não, é possível escolher a aresta do vertice de acordo com a ordem
-TNoLista * aresta(const TGrafo *g, TId u, TId v){
+// Parametro direcao para escolhar a lista direta ou reversa
+TNoLista * aresta(const TGrafo *g, TId u, TId v, int direcao){
 
-    //grafo sem vértices?
-    if(g -> n == 0 || g -> vertices == NULL)
+    if(is_invalid(g, u, v))
         return NULL;
 
     else{
+        
+        
+        TNoLista *cur = direcao == 0 ? g -> vertices[u].direto : g -> vertices[u].reverso;
+        TNoLista *next;
 
-        TNoLista *aux = g -> vertices[u].direto;
-        TNoLista *atual;
-
-        if(aux == NULL){
+        if(cur == NULL){
             //printf("é nulo\n");
             return NULL;
         }
+        
+        if(cur -> aresta.destino == v){
+            return NULL;
+        }
+        
+        next = cur -> prox;
 
-        atual = aux -> prox;
-
-        if(atual == NULL){
+        if(next == NULL){
             return NULL;
         }
 
-        if(aux -> aresta.destino == v){
-            return NULL;
+        while(next -> aresta.destino != v && next -> prox != NULL){
+            cur = next;
+            next = next -> prox;
         }
 
-        while(atual -> aresta.destino != v || atual -> prox != NULL){
-            aux = atual;
-            atual = atual -> prox;
-        }
-
-        return aux;
+        return cur;
     }
 }
 
 // Remove uma aresta do grafo. Retorna falso se a aresta não foi encontrada.
 int desconectar(TGrafo *g, TId u, TId v){
 
-    //Desconecta só uma aresta de u a v.
+    if(is_invalid(g, u, v))
+        return 0;
+    
     if(g -> direcionado){
 
-        TNoLista *cur = aresta(g, u, v);
-
+        TNoLista *cur = aresta(g, u, v, 0);
+        TNoLista *reverse_cur = aresta(g, v, u, 1);
+        
+        if(reverse_cur == NULL){
+            if(g -> vertices[v].reverso != NULL && g -> vertices[v].reverso -> aresta.destino == u){
+                g -> vertices[v].reverso = reverse_cur = NULL;
+            }
+        }
+        
         if(cur == NULL){
             if(g -> vertices[u].direto != NULL && g -> vertices[u].direto -> aresta.destino == v){
-                free(cur);
                 g -> vertices[u].direto = cur = NULL;
             }
         }
@@ -177,14 +198,24 @@ int desconectar(TGrafo *g, TId u, TId v){
             }
         }
         
-        g -> m--;
+        if(reverse_cur != NULL){
+            if(reverse_cur -> prox != NULL){
+                TNoLista *del = reverse_cur -> prox;
+                reverse_cur -> prox = reverse_cur -> prox -> prox;
+                free(del);
+                del = reverse_cur = NULL;
+            }
+        }
+        
+        g -> vertices[v].grauEntrada--;
+        g -> vertices[u].grauSaida--;
     }
 
     // Nesse caso, é necessário remover o par de arestas que simboliza o direcionamento.
     else{
 
-        TNoLista *cur = aresta(g, u, v);
-        TNoLista *reverse_cur = aresta(g, v, u);
+        TNoLista *cur = aresta(g, u, v, 0);
+        TNoLista *reverse_cur = aresta(g, v, u, 0);
 
         if(cur == NULL){
             if(g -> vertices[u].direto != NULL && g -> vertices[u].direto -> aresta.destino == v){
@@ -195,7 +226,7 @@ int desconectar(TGrafo *g, TId u, TId v){
 
         if(reverse_cur == NULL){
             if(g -> vertices[v].direto != NULL && g -> vertices[v].direto -> aresta.destino == u){
-                free(reverse_cur)
+                free(reverse_cur);
                 g -> vertices[v].direto = reverse_cur = NULL;
             }
         }
@@ -214,65 +245,139 @@ int desconectar(TGrafo *g, TId u, TId v){
                 TNoLista *reverse_del = reverse_cur -> prox;
                 reverse_cur -> prox = reverse_cur -> prox -> prox;
                 free(reverse_cur);
-                del = reverse_cur = NULL;
+                reverse_del = reverse_cur = NULL;
             }
         }
         
-        g -> m--;
+        g -> vertices[u].grauSaida--;
+        g -> vertices[v].grauSaida--;
     }
-
+    
+    g -> m--;
     return 1;
-}
-
-// Conecta dois vértices por uma aresta
-const TAresta * conectar(TGrafo *g, TId u, TId v) {
-    return conectarPeso(g, u, v, 0, "");
 }
 
 // Conecta dois vértices por uma aresta com peso.
 
 const TAresta * conectarPeso(TGrafo *g, TId u, TId v, TPeso peso, char *rotulo){
 
-    printf("show");
-
-    if(!g -> n || g -> vertices == NULL)
+    if(is_invalid(g, u, v))
         return NULL;
 
     else{
+        
+        // adciona aresta de u a v e a aresta reversa v a u.
+        if(g -> direcionado){
+            TNoLista *cur = (TNoLista *) malloc (sizeof(TNoLista));
+            TNoLista *reverse_cur = (TNoLista *) malloc (sizeof(TNoLista));
+            
+            fill(cur, v, peso, rotulo);
+            fill(reverse_cur, u, peso, rotulo);
+            
+            TNoLista *ref = g -> vertices[u].direto;
+            TNoLista *reverse_ref = g -> vertices[v].reverso;
+            
+            cur -> prox = ref;
+            reverse_cur -> prox = reverse_ref;
+            
+            g -> vertices[u].direto = cur;
+            g -> vertices[v].reverso = reverse_cur;
+            
+            g -> vertices[u].grauSaida++;
+            g -> vertices[v].grauEntrada++;
+        }
+        
+        
+        else{
+            
+            TNoLista *cur = (TNoLista *) malloc (sizeof(TNoLista));
+            TNoLista *reverse_cur = (TNoLista *) malloc (sizeof(TNoLista));
+            
+            fill(cur, v, peso, rotulo);
+            fill(reverse_cur, u, peso, rotulo);
+            
+            TNoLista *ref = g -> vertices[u].direto;
+            TNoLista *reverse_ref = g -> vertices[v].direto;
 
-        printf("show");
+            cur -> prox = ref;
+            reverse_cur -> prox = reverse_ref;
 
-        TNoLista *cur = (TNoLista *) malloc (sizeof(TNoLista));
-
-        cur -> aresta.destino = v;
-        cur -> aresta.peso = peso;
-        cur -> aresta.rotulo = rotulo;
-
-        TNoLista *ref = g -> vertices[u].direto;
-
-        cur -> prox = ref;
-
-        g -> vertices[u].direto = cur;
-
+            g -> vertices[u].direto = cur;
+            g -> vertices[v].direto = reverse_cur;
+            
+            g -> vertices[u].grauSaida++;
+            g -> vertices[v].grauSaida++;
+        }
+        
         g -> m++;
-
     }
 }
 
+// Conecta dois vértices por uma aresta
+const TAresta * conectar(TGrafo *g, TId u, TId v) {
+    return conectarPeso(g, u, v, 0, NULL);
+}
+
+
+
 // Altera o peso de uma aresta existente. Retorna NULL se não houver aresta.
 TAresta * alteraPeso(TGrafo *g, TId u, TId v, TPeso peso, char *rotulo){
-
-    TNoLista *cur = aresta(g, u, v);
-
-    if(cur == NULL && g -> vertices[u].direto != NULL && vertice[u].direto -> aresta.destino == v){
-        cur -> aresta.peso = peso;
-        cur -> aresta.rotulo = rotulo;
+    
+    if(g -> direcionado){
+        
+        TNoLista *cur = aresta(g, u, v, 0);
+        TNoLista *reverse_cur = aresta(g, v, u, 1);
+        
+        if(cur == NULL && g -> vertices[u].direto != NULL && g -> vertices[u].direto -> aresta.destino == v){
+            g -> vertices[u].direto -> aresta.peso = peso;
+            g -> vertices[u].direto -> aresta.rotulo = rotulo;
+        }
+        
+        else{
+            cur -> prox -> aresta.peso = peso;
+            cur -> prox -> aresta.rotulo = rotulo;
+        }
+        
+        if(reverse_cur == NULL && g -> vertices[v].reverso != NULL && g -> vertices[v].reverso -> aresta.destino == u){
+            g -> vertices[v].reverso -> aresta.peso = peso;
+            g -> vertices[v].reverso -> aresta.rotulo = rotulo;
+        }
+        
+        else{
+            reverse_cur -> prox -> aresta.peso = peso;
+            reverse_cur -> prox -> aresta.rotulo = rotulo;
+        }
+        
+        
     }
+    
     else{
-        cur -> prox -> aresta.peso = peso;
-        cur -> prox -> aresta.rotulo = rotulo;
-    }
+        
+        TNoLista *cur = aresta(g, u, v, 0);
+        TNoLista *reverse_cur = aresta(g, v, u, 0);
 
+        if(cur == NULL && g -> vertices[u].direto != NULL && g -> vertices[u].direto -> aresta.destino == v){
+            g -> vertices[u].direto -> aresta.peso = peso;
+            g -> vertices[u].direto -> aresta.rotulo = rotulo;
+        }
+        
+        else{
+            cur -> prox -> aresta.peso = peso;
+            cur -> prox -> aresta.rotulo = rotulo;
+        }
+        
+        if(reverse_cur == NULL && g -> vertices[v].direto != NULL && g -> vertices[v].direto -> aresta.destino == u){
+            g -> vertices[v].direto -> aresta.peso = peso;
+            g -> vertices[v].direto -> aresta.rotulo = rotulo;
+        }
+        
+        else{
+            reverse_cur -> prox -> aresta.peso = peso;
+            reverse_cur -> prox -> aresta.rotulo = rotulo;
+        }
+    
+    }
+    
     return NULL;
 }
 
@@ -314,7 +419,7 @@ void print_graph(TGrafo *g){
 
             printf("\t\tnome aresta: %s\n", cur -> aresta.rotulo);
             printf("\t\tpeso aresta: %lf\n", cur -> aresta.peso);
-            printf("\t\tsai de %d e vai a %d\n", i, cur -> aresta.destino);
+            printf("\t\tsai de %d e vai a %d\n", cur -> aresta.destino, i);
             cur = cur -> prox;
 
         }
@@ -326,22 +431,34 @@ int main(){
 
     TGrafo *g;
 
-    g = create_graph(5, 0, 0);
+    g = create_graph(5, NULL, 1);
 
     conectar(g, 0, 1);
     conectar(g, 0, 2);
     conectar(g, 0, 3);
-
+    conectar(g, 4, 0);
+    
+    
+    //desconectar(g, 0, 1);
+    //desconectar(g, 0, 2);
+    //desconectar(g, 0, 3);
+    //desconectar(g, 4, 9);
 
     //alteraPeso(g, 0, 1, 5.0, "nome bacana");
     //alteraPeso(g, 0, 2, 10.0, "nome bacana2");
     //alteraPeso(g, 0, 3, 10000.0, "nome bacana2123123");
+    //alteraPeso(g, 4, 0, 123123123.0, "julinho sdds");
 
 
-    TNoLista *aux = aresta(g, 0, 1);
+    TNoLista *aux = aresta(g, 0, 7, 0);
 
     if(aux != NULL){
         printf("achou %d\n", aux -> prox -> aresta.destino);
+    }
+    else{
+        if(g -> vertices[0].direto != NULL && g -> vertices[0].direto -> aresta.destino == 7){
+            printf("achou %d\n", g -> vertices[0].direto -> aresta.destino);
+        }
     }
 
     print_graph(g);

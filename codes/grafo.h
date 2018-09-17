@@ -44,14 +44,20 @@ struct SGrafo {
 
 typedef struct SGrafo TGrafo;
 
+//Prenche um nó aresta.
+void fill(TNoLista *cur, TId destino, TPeso peso, char *rotulo);
+
+//Verifica se é invalido
+int is_invalid(const TGrafo *g, TId v, TId u);
+
 // Inicializa um grafo para conter n vértices e m arestas.
-int init_graph(TGrafo *g, TId n, TId m, int direcionado);
+int init_graph(TGrafo *g, TId n, char *nome, int direcionado)
 
 // Desaloca todas as estruturas relacionadas ao grafo.
 int finaliza_grafo(TGrafo *g);
 
 // Cria um grafo para conter n vértices e m arestas.
-TGrafo * cria_grafo(TId n, TId m, int direcionado);
+TGrafo * create_graph(TId n, char* nome, int direcionado);
 
 // Desaloca todo o grafo, inclusive a estrutura principal.
 void destroi_grafo(TGrafo *g);
@@ -70,7 +76,7 @@ TId grauEntradaVertice(const TGrafo *g, TId u);
 
 // Verifica se u, v é uma aresta no grafo e retona sua referência, se 
 // encontrada, ou NULL caso contrário.
-TNoLista * aresta(const TGrafo *g, TId u, TId v);
+TNoLista * aresta(const TGrafo *g, TId u, TId v, int direcao);
 
 // Remove uma aresta do grafo. Retorna falso se a aresta não foi encontrada.
 int desconectar(TGrafo *g, TId u, TId v);
