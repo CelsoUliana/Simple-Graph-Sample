@@ -28,19 +28,19 @@ int init_graph(TGrafo *g, TId n, char *nome, int direcionado) {
     return 1;
 }
 
-// funcao preencher
+// Funcao preencher TNoLista.
 void fill(TNoLista *cur, TId destino, TPeso peso, char *rotulo){
     cur -> aresta.destino = destino;
     cur -> aresta.rotulo = rotulo;
     cur -> aresta.peso = peso;
 }
 
-//grafo sem vértices ou fora do limite?
+// Grafo sem vertices ou fora do limite.
 int is_invalid(const TGrafo *g, TId v, TId u){
     return g -> n == 0 || g -> vertices == NULL || v >= g -> n || u >= g -> n;
 }
 
-// Inicializa um grafo para conter n vértices
+// Inicializa um grafo para conter n vertices.
 TGrafo * create_graph(TId n, char* nome, int direcionado) {
 
     TGrafo * g = (TGrafo *) malloc (sizeof(TGrafo));
@@ -57,7 +57,7 @@ TGrafo * create_graph(TId n, char* nome, int direcionado) {
     }
 }
 
-// Função auxiliar para liberar listas ligadas
+// Função auxiliar para liberar listas ligadas.
 static int finaliza_lista(TNoLista *lista) {
 
     TNoLista *cur;
@@ -112,8 +112,6 @@ TId contaArestas(const TGrafo *g) {
     return g -> m;
 }
 
-/* SUA IMPLEMENTAÇÃO A PARTIR DAQUI */ 
-
 TId grauSaidaVertice(const TGrafo *g, TId u){
     return g -> vertices[u].grauSaida;
 }
@@ -122,15 +120,15 @@ TId grauEntradaVertice(const TGrafo *g, TId u){
     return g -> vertices[u].grauEntrada;
 }
 
-// Retorna grau entrada + grau saida
+// Retorna soma de grau entrada e grau saida.
 TId grauVertice(const TGrafo *g, TId u){
     return grauSaidaVertice(g, u) + grauEntradaVertice(g, u);
 }
 
-// Verifica se u, v é uma aresta no grafo e retona sua referência, se 
+// Verifica se u, v eh uma aresta no grafo e retona sua referência, se 
 // encontrada, ou NULL caso contrário.
-// Retorna a referencia ao nó antigo.
-// Parametro direcao para escolhar a lista direta ou reversa
+// Retorna a referencia ao no antigo.
+// Parametro direcao para escolhar a lista direta ou reversa.
 TNoLista * aresta(const TGrafo *g, TId u, TId v, int direcao){
 
     if(is_invalid(g, u, v))
@@ -143,7 +141,6 @@ TNoLista * aresta(const TGrafo *g, TId u, TId v, int direcao){
         TNoLista *next;
 
         if(cur == NULL){
-            //printf("é nulo\n");
             return NULL;
         }
         
@@ -166,7 +163,7 @@ TNoLista * aresta(const TGrafo *g, TId u, TId v, int direcao){
     }
 }
 
-// Remove uma aresta do grafo. Retorna falso se a aresta não foi encontrada.
+// Remove uma aresta do grafo. Retorna falso se a aresta nao foi encontrada.
 int desconectar(TGrafo *g, TId u, TId v){
 
     if(is_invalid(g, u, v))
@@ -211,7 +208,7 @@ int desconectar(TGrafo *g, TId u, TId v){
         g -> vertices[u].grauSaida--;
     }
 
-    // Nesse caso, é necessário remover o par de arestas que simboliza o direcionamento.
+    // Nesse caso, eh necessário remover o par de arestas que simboliza o direcionamento.
     else{
 
         TNoLista *cur = aresta(g, u, v, 0);
@@ -257,8 +254,7 @@ int desconectar(TGrafo *g, TId u, TId v){
     return 1;
 }
 
-// Conecta dois vértices por uma aresta com peso.
-
+// Conecta dois vertices por uma aresta com peso.
 const TAresta * conectarPeso(TGrafo *g, TId u, TId v, TPeso peso, char *rotulo){
 
     if(is_invalid(g, u, v))
@@ -266,7 +262,7 @@ const TAresta * conectarPeso(TGrafo *g, TId u, TId v, TPeso peso, char *rotulo){
 
     else{
         
-        // adciona aresta de u a v e a aresta reversa v a u.
+        // Adiciona aresta de u a v e a aresta reversa v a u.
         if(g -> direcionado){
             TNoLista *cur = (TNoLista *) malloc (sizeof(TNoLista));
             TNoLista *reverse_cur = (TNoLista *) malloc (sizeof(TNoLista));
@@ -287,7 +283,7 @@ const TAresta * conectarPeso(TGrafo *g, TId u, TId v, TPeso peso, char *rotulo){
             g -> vertices[v].grauEntrada++;
         }
         
-        
+        // Adiciona aresta de u a v e v a u ambos na lista direta.
         else{
             
             TNoLista *cur = (TNoLista *) malloc (sizeof(TNoLista));
@@ -313,14 +309,14 @@ const TAresta * conectarPeso(TGrafo *g, TId u, TId v, TPeso peso, char *rotulo){
     }
 }
 
-// Conecta dois vértices por uma aresta
+// Conecta dois vértices por uma aresta.
 const TAresta * conectar(TGrafo *g, TId u, TId v) {
     return conectarPeso(g, u, v, 0, NULL);
 }
 
 
 
-// Altera o peso de uma aresta existente. Retorna NULL se não houver aresta.
+// Altera o nome e o peso de uma aresta existente. Retorna NULL se não houver aresta.
 TAresta * alteraPeso(TGrafo *g, TId u, TId v, TPeso peso, char *rotulo){
     
     if(g -> direcionado){
@@ -381,6 +377,7 @@ TAresta * alteraPeso(TGrafo *g, TId u, TId v, TPeso peso, char *rotulo){
     return NULL;
 }
 
+// Funcao auxiliar de printar o grafo.
 void print_graph(TGrafo *g){
 
     if(g == NULL){

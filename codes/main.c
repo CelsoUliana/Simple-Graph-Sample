@@ -24,20 +24,19 @@ void lista_grau_min(const TGrafo *g, FILE *saida) {
     TId i;
 
     // Procura por vértices de grau menor.
-    for (i = 0; i < g->n; i++) {
+    for (i = 0; i < g -> n; i++) {
 
-        TId grauv = g -> vertices[i].grauEntrada + g -> vertices[i].grauSaida;
+        TId grauv = grauVertice(g, i);
 
         if (grauv < gmin)
             gmin = grauv;
     }
   
-    // Agora, imprime-os.
     fprintf(saida, "Grau mínimo: %d. Vértices: ", gmin);
 
     for (i = 0; i < g -> n; i++) {
 
-        TId grauv = g -> vertices[i].grauEntrada + g->vertices[i].grauSaida;
+        TId grauv = g -> grauVertice(g, i);
 
         if (grauv == gmin)
             fprintf(saida, "%d ", i);
@@ -52,6 +51,31 @@ com o grau máximo.
 Se orientado, considerar a soma dos graus de entrada e saída.
 */
 void lista_grau_max(const TGrafo *g, FILE *saida) {
+
+    TId gmax = 2 * g -> n;
+    TId i;
+
+    for(i = 0; i < g -> n; i++){
+       
+        TId grauv = g -> grauVertice(g, i);
+
+        if(grauv > gmax)
+            gmax = grauv;
+    }
+
+    fprintf(saida, "Grau mínimo: %d. Vértices: ", gmax);
+
+
+    for (i = 0; i < g -> n; i++) {
+
+        TId grauv = g -> grauVertice(g, i);
+
+        if (grauv == gmax)
+            fprintf(saida, "%d ", i);
+    }
+
+    fprintf(saida, ".\n");
+
 }
 
 // Imprime mensagem de uso, usada em caso de problema nos argumentos.
