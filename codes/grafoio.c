@@ -9,18 +9,31 @@
 //   - Um ponteiro NULL, caso em que o grafo serrÃ¡ criado e retornado.
 // TODO: contar arestas e conferir
 TGrafo * le_grafo_dimacs(TGrafo *g, FILE* arquivo) {
-    int n, m, dir;
-    char c, *p;
+    int n, m, dir, aux, sai, chega;
+    char c, *p, *nome;
+    double peso;
     
     fscanf("%c %c %d %d %s", &c, &c, &n, &m, p);
     
     if(g == NULL)
-        g = create_graph(n, m, dir);
+        g = create_graph(n, p, dir);
         
     else
-        init_graph(g, n, m, dir); // & ou não?
+        init_graph(g, n, p, dir); // & ou não?
     
-    // continua lendo o arquivo.
+    
+    for(int i = 0; i < n; i++){
+        fscanf("%c %d %lf %s", &c, &aux, &peso, nome);
+        
+        g -> vertices[i].peso = peso;
+        g -> vertices[i].rotulo = nome;
+    }
+    
+    for(int i = 0; i < m; i++){
+        fscanf("%c %d %d %lf %s", &c, &sai, &chega, &peso, nome);
+        conectarPeso(g, sai, chega, peso, nome);
+    }
+    
   
     return NULL;
 }
@@ -36,9 +49,23 @@ int salva_grafo_dimacs(const TGrafo *g, FILE* arquivo) {
         fprintf(arquivo, "N %d %lf %s\n", i, g -> vertices[i].peso, g -> vertices[i].rotulo);
     }
     
-    for(i = 0; i < g -> n; i++){
-        // arestas para cada vertice.
-    }   
+    TGrafo *cp = g;
+    
+    if(cp -> vertices != NULL){
+        for(i = 0; i < cp -> n; i++){
+            TNoLista *aux = cp -> vertices[i].direto;
+            
+            while(aux != NULL){
+                fprintf(arquivo, "E %d %d %lf %s", i, aux -> aresta.destino, aux -> aresta.peso, aux -> aresta.nome);
+                
+                int destino = aux -> aresta.destino;
+                
+                aux = aux -> prox;
+                desconectar(cp, i, destino);
+            }
+            
+        }
+    }
     
     return 1;
 }
