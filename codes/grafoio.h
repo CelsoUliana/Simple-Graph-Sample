@@ -17,4 +17,10 @@ int salva_grafo_dimacs(const TGrafo *g, FILE* arquivo);
 // Salva um grafo no formato dot
 int salva_grafo_dot(const TGrafo *g, FILE* arquivo);
 
+// Debug a saida dimacs
+int debug_grafo_dimacs(TGrafo *g);
+
+// Debug a saida dot
+int debug_grafo_dot(const TGrafo *g);
+
 #endif

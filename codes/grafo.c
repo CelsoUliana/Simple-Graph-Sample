@@ -28,6 +28,13 @@ int init_graph(TGrafo *g, TId n, char *nome, int direcionado) {
     return 1;
 }
 
+// Dá um nome pra um vertice u
+void set_nome_vertice(TGrafo *g, TId u, char *nome){
+    if(u >= 0 && u <= g -> n)
+        g -> vertices[u].rotulo = nome;
+        
+}
+
 // Funcao preencher TNoLista.
 void fill(TNoLista *cur, TId destino, TPeso peso, char *rotulo){
     cur -> aresta.destino = destino;
@@ -169,62 +176,14 @@ int desconectar(TGrafo *g, TId u, TId v){
     if(is_invalid(g, u, v))
         return 0;
     
-    if(g -> direcionado){
-
-        TNoLista *cur = aresta(g, u, v, 0);
-        TNoLista *reverse_cur = aresta(g, v, u, 1);
-        
-        if(reverse_cur == NULL){
-            if(g -> vertices[v].reverso != NULL && g -> vertices[v].reverso -> aresta.destino == u){
-                g -> vertices[v].reverso = reverse_cur = NULL;
-            }
-        }
-        
-        if(cur == NULL){
-            if(g -> vertices[u].direto != NULL && g -> vertices[u].direto -> aresta.destino == v){
-                g -> vertices[u].direto = cur = NULL;
-            }
-        }
-
-        if(cur != NULL){
-            if(cur -> prox != NULL){
-                TNoLista *del = cur -> prox;
-                cur -> prox = cur -> prox -> prox;
-                free(del);
-                del = cur = NULL;
-            }
-        }
-        
-        if(reverse_cur != NULL){
-            if(reverse_cur -> prox != NULL){
-                TNoLista *del = reverse_cur -> prox;
-                reverse_cur -> prox = reverse_cur -> prox -> prox;
-                free(del);
-                del = reverse_cur = NULL;
-            }
-        }
-        
-        g -> vertices[v].grauEntrada--;
-        g -> vertices[u].grauSaida--;
-    }
-
-    // Nesse caso, eh necessário remover o par de arestas que simboliza o direcionamento.
+    
     else{
-
+        
         TNoLista *cur = aresta(g, u, v, 0);
-        TNoLista *reverse_cur = aresta(g, v, u, 0);
-
+         
         if(cur == NULL){
             if(g -> vertices[u].direto != NULL && g -> vertices[u].direto -> aresta.destino == v){
-                free(cur);
                 g -> vertices[u].direto = cur = NULL;
-            }
-        }
-
-        if(reverse_cur == NULL){
-            if(g -> vertices[v].direto != NULL && g -> vertices[v].direto -> aresta.destino == u){
-                free(reverse_cur);
-                g -> vertices[v].direto = reverse_cur = NULL;
             }
         }
 
@@ -236,18 +195,53 @@ int desconectar(TGrafo *g, TId u, TId v){
                 del = cur = NULL;
             }
         }
-
-        if(reverse_cur != NULL){
-            if(reverse_cur -> prox != NULL){
-                TNoLista *reverse_del = reverse_cur -> prox;
-                reverse_cur -> prox = reverse_cur -> prox -> prox;
-                free(reverse_cur);
-                reverse_del = reverse_cur = NULL;
-            }
-        }
         
         g -> vertices[u].grauSaida--;
-        g -> vertices[v].grauSaida--;
+        
+        if(g -> direcionado){
+    
+            TNoLista *reverse_cur = aresta(g, v, u, 1);
+        
+            if(reverse_cur == NULL){
+                if(g -> vertices[v].reverso != NULL && g -> vertices[v].reverso -> aresta.destino == u){
+                    g -> vertices[v].reverso = reverse_cur = NULL;
+                }
+            }
+        
+            if(reverse_cur != NULL){
+                if(reverse_cur -> prox != NULL){
+                    TNoLista *del = reverse_cur -> prox;
+                    reverse_cur -> prox = reverse_cur -> prox -> prox;
+                    free(del);
+                    del = reverse_cur = NULL;
+                }
+            }
+        
+            g -> vertices[v].grauEntrada--;
+        }
+        
+        else{
+
+            TNoLista *reverse_cur = aresta(g, v, u, 0);
+
+            if(reverse_cur == NULL){
+                if(g -> vertices[v].direto != NULL && g -> vertices[v].direto -> aresta.destino == u){
+                    free(reverse_cur);
+                    g -> vertices[v].direto = reverse_cur = NULL;
+                }
+            }
+
+            if(reverse_cur != NULL){
+                if(reverse_cur -> prox != NULL){
+                    TNoLista *reverse_del = reverse_cur -> prox;
+                    reverse_cur -> prox = reverse_cur -> prox -> prox;
+                    free(reverse_del);
+                    reverse_del = reverse_cur = NULL;
+                }
+            }
+        
+            g -> vertices[v].grauSaida--;
+        }   
     }
     
     g -> m--;
@@ -262,46 +256,39 @@ const TAresta * conectarPeso(TGrafo *g, TId u, TId v, TPeso peso, char *rotulo){
 
     else{
         
-        // Adiciona aresta de u a v e a aresta reversa v a u.
+        // Adiciona a aresta de U a V
+        TNoLista *cur = (TNoLista *) malloc (sizeof(TNoLista));
+        fill(cur, v, peso, rotulo);
+        
+        TNoLista *ref = g -> vertices[u].direto;
+        cur -> prox = ref;
+        
+        g -> vertices[u].direto = cur;
+        g -> vertices[u].grauSaida++;
+        
+        // Adiciona a aresta reversa V a U.
         if(g -> direcionado){
-            TNoLista *cur = (TNoLista *) malloc (sizeof(TNoLista));
-            TNoLista *reverse_cur = (TNoLista *) malloc (sizeof(TNoLista));
-            
-            fill(cur, v, peso, rotulo);
+
+            TNoLista *reverse_cur = (TNoLista *) malloc (sizeof(TNoLista));        
             fill(reverse_cur, u, peso, rotulo);
             
-            TNoLista *ref = g -> vertices[u].direto;
-            TNoLista *reverse_ref = g -> vertices[v].reverso;
-            
-            cur -> prox = ref;
+            TNoLista *reverse_ref = g -> vertices[v].reverso;  
             reverse_cur -> prox = reverse_ref;
             
-            g -> vertices[u].direto = cur;
-            g -> vertices[v].reverso = reverse_cur;
-            
-            g -> vertices[u].grauSaida++;
+            g -> vertices[v].reverso = reverse_cur;  
             g -> vertices[v].grauEntrada++;
         }
         
-        // Adiciona aresta de u a v e v a u ambos na lista direta.
+        // Adiciona aresta direita V a U
         else{
             
-            TNoLista *cur = (TNoLista *) malloc (sizeof(TNoLista));
-            TNoLista *reverse_cur = (TNoLista *) malloc (sizeof(TNoLista));
-            
-            fill(cur, v, peso, rotulo);
+            TNoLista *reverse_cur = (TNoLista *) malloc (sizeof(TNoLista));     
             fill(reverse_cur, u, peso, rotulo);
             
-            TNoLista *ref = g -> vertices[u].direto;
             TNoLista *reverse_ref = g -> vertices[v].direto;
-
-            cur -> prox = ref;
             reverse_cur -> prox = reverse_ref;
 
-            g -> vertices[u].direto = cur;
-            g -> vertices[v].direto = reverse_cur;
-            
-            g -> vertices[u].grauSaida++;
+            g -> vertices[v].direto = reverse_cur;       
             g -> vertices[v].grauSaida++;
         }
         
@@ -314,62 +301,63 @@ const TAresta * conectar(TGrafo *g, TId u, TId v) {
     return conectarPeso(g, u, v, 0, NULL);
 }
 
+const TAresta * conectar(TGrafo *g, TId u, TId v, TPeso peso, char *nome) {
+    return conectarPeso(g, u, v, peso, nome);
+}
 
 
 // Altera o nome e o peso de uma aresta existente. Retorna NULL se não houver aresta.
 TAresta * alteraPeso(TGrafo *g, TId u, TId v, TPeso peso, char *rotulo){
     
-    if(g -> direcionado){
-        
-        TNoLista *cur = aresta(g, u, v, 0);
-        TNoLista *reverse_cur = aresta(g, v, u, 1);
-        
-        if(cur == NULL && g -> vertices[u].direto != NULL && g -> vertices[u].direto -> aresta.destino == v){
-            g -> vertices[u].direto -> aresta.peso = peso;
-            g -> vertices[u].direto -> aresta.rotulo = rotulo;
-        }
-        
-        else{
-            cur -> prox -> aresta.peso = peso;
-            cur -> prox -> aresta.rotulo = rotulo;
-        }
-        
-        if(reverse_cur == NULL && g -> vertices[v].reverso != NULL && g -> vertices[v].reverso -> aresta.destino == u){
-            g -> vertices[v].reverso -> aresta.peso = peso;
-            g -> vertices[v].reverso -> aresta.rotulo = rotulo;
-        }
-        
-        else{
-            reverse_cur -> prox -> aresta.peso = peso;
-            reverse_cur -> prox -> aresta.rotulo = rotulo;
-        }
-        
-        
-    }
+    
+    if(is_invalid(g, u, v))
+        return NULL;
     
     else{
         
+        // Altera o peso da aresta U a V
         TNoLista *cur = aresta(g, u, v, 0);
-        TNoLista *reverse_cur = aresta(g, v, u, 0);
-
+        
         if(cur == NULL && g -> vertices[u].direto != NULL && g -> vertices[u].direto -> aresta.destino == v){
             g -> vertices[u].direto -> aresta.peso = peso;
             g -> vertices[u].direto -> aresta.rotulo = rotulo;
         }
         
-        else{
+        else if(cur != NULL){
             cur -> prox -> aresta.peso = peso;
             cur -> prox -> aresta.rotulo = rotulo;
         }
         
-        if(reverse_cur == NULL && g -> vertices[v].direto != NULL && g -> vertices[v].direto -> aresta.destino == u){
-            g -> vertices[v].direto -> aresta.peso = peso;
-            g -> vertices[v].direto -> aresta.rotulo = rotulo;
+        // Altera o peso da aresta reversa V a U
+        if(g -> direcionado){
+        
+            TNoLista *reverse_cur = aresta(g, v, u, 1);
+            
+            if(reverse_cur == NULL && g -> vertices[v].reverso != NULL && g -> vertices[v].reverso -> aresta.destino == u){
+                g -> vertices[v].reverso -> aresta.peso = peso;
+                g -> vertices[v].reverso -> aresta.rotulo = rotulo;
+            }
+        
+            else if(reverse_cur != NULL){
+                reverse_cur -> prox -> aresta.peso = peso;
+                reverse_cur -> prox -> aresta.rotulo = rotulo;
+            }
         }
         
+        // Altera o peso da aresta direta V a U
         else{
-            reverse_cur -> prox -> aresta.peso = peso;
-            reverse_cur -> prox -> aresta.rotulo = rotulo;
+            
+            TNoLista *reverse_cur = aresta(g, v, u, 0);
+            
+            if(reverse_cur == NULL && g -> vertices[v].direto != NULL && g -> vertices[v].direto -> aresta.destino == u){
+                g -> vertices[v].direto -> aresta.peso = peso;
+                g -> vertices[v].direto -> aresta.rotulo = rotulo;
+            }
+            
+            else if(reverse_cur != NULL){
+                reverse_cur -> prox -> aresta.peso = peso;
+                reverse_cur -> prox -> aresta.rotulo = rotulo;
+            }
         }
     
     }
@@ -378,7 +366,7 @@ TAresta * alteraPeso(TGrafo *g, TId u, TId v, TPeso peso, char *rotulo){
 }
 
 // Funcao auxiliar de printar o grafo.
-void print_graph(TGrafo *g){
+void debug_graph(TGrafo *g){
 
     if(g == NULL){
         printf("Grafo nulo.\n");
@@ -428,23 +416,34 @@ int main(){
 
     TGrafo *g;
 
-    g = create_graph(5, NULL, 1);
-
-    conectar(g, 0, 1);
-    conectar(g, 0, 2);
-    conectar(g, 0, 3);
-    conectar(g, 4, 0);
+    g = create_graph(5, (char*) "Casa", 1);
+    set_nome_vertice(g, 0, (char*)"I1");
+    set_nome_vertice(g, 1, (char*)"I2");
+    set_nome_vertice(g, 2, (char*)"I3");
+    set_nome_vertice(g, 3, (char*)"I4");
+    set_nome_vertice(g, 4, (char*)"I5");
     
+    conectar(g, 0, 1, 0, (char*)"P1");
+    conectar(g, 1, 2, 0, (char*)"P2");
+    conectar(g, 2, 3, 0, (char*)"P3");
+    conectar(g, 3, 4, 0, (char*)"P4");
+    conectar(g, 4, 0, 0, (char*)"P5");
+    conectar(g, 1, 4, 0, (char*)"TETO");
+    
+    
+    debug_grafo_dimacs(g);
+    printf("\n\n");
+    debug_grafo_dot(g);
     
     //desconectar(g, 0, 1);
     //desconectar(g, 0, 2);
     //desconectar(g, 0, 3);
     //desconectar(g, 4, 9);
 
-    //alteraPeso(g, 0, 1, 5.0, "nome bacana");
-    //alteraPeso(g, 0, 2, 10.0, "nome bacana2");
-    //alteraPeso(g, 0, 3, 10000.0, "nome bacana2123123");
-    //alteraPeso(g, 4, 0, 123123123.0, "julinho sdds");
+    //alteraPeso(g, 0, 1, 5.0, (char*)"nome bacana");
+    //alteraPeso(g, 0, 2, 10.0, (char*)"nome bacana2");
+    //alteraPeso(g, 0, 3, 10000.0, (char*)"nome bacana2123123");
+    //alteraPeso(g, 4, 0, 123123123.0, (char*)"julinho sdds");
 
 
     TNoLista *aux = aresta(g, 0, 7, 0);
@@ -458,7 +457,7 @@ int main(){
         }
     }
 
-    print_graph(g);
+    //debug_graph(g);
 
     destroi_grafo(g);
 }

@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+
 // LÃª um grafo no formato DIMACS adaptado.
 // g pode ser:
 //   - Um grafo alocado, mas nÃ£o inicializado, caso em que serÃ¡
@@ -13,7 +14,7 @@ TGrafo * le_grafo_dimacs(TGrafo *g, FILE* arquivo) {
     char c, *p, *nome;
     double peso;
     
-    fscanf("%c %c %d %d %s", &c, &c, &n, &m, p);
+    fscanf(arquivo ,"%c %c %d %d %s", &c, &c, &n, &m, p);
     
     if(g == NULL)
         g = create_graph(n, p, dir);
@@ -23,14 +24,14 @@ TGrafo * le_grafo_dimacs(TGrafo *g, FILE* arquivo) {
     
     
     for(int i = 0; i < n; i++){
-        fscanf("%c %d %lf %s", &c, &aux, &peso, nome);
+        fscanf(arquivo, "%c %d %lf %s", &c, &aux, &peso, nome);
         
-        g -> vertices[i].peso = peso;
-        g -> vertices[i].rotulo = nome;
+        g -> vertices[aux].peso = peso;
+        g -> vertices[aux].rotulo = nome;
     }
     
     for(int i = 0; i < m; i++){
-        fscanf("%c %d %d %lf %s", &c, &sai, &chega, &peso, nome);
+        fscanf(arquivo, "%c %d %d %lf %s", &c, &sai, &chega, &peso, nome);
         conectarPeso(g, sai, chega, peso, nome);
     }
     
@@ -39,8 +40,8 @@ TGrafo * le_grafo_dimacs(TGrafo *g, FILE* arquivo) {
 }
 
 // Salva um grafo no formato DIMACS
-int salva_grafo_dimacs(const TGrafo *g, FILE* arquivo) {  
-    char dir = g -> direcionado == 1 ? 'U' : 'D' ;
+int salva_grafo_dimacs(TGrafo *g, FILE* arquivo) {  
+    char dir = g -> direcionado == 1 ? 'D' : 'U' ;
     int i;
     
     fprintf(arquivo, "G %c %d %d %s\n", dir, g -> n, g -> m, g -> nome);
@@ -49,19 +50,57 @@ int salva_grafo_dimacs(const TGrafo *g, FILE* arquivo) {
         fprintf(arquivo, "N %d %lf %s\n", i, g -> vertices[i].peso, g -> vertices[i].rotulo);
     }
     
-    TGrafo *cp = g;
     
-    if(cp -> vertices != NULL){
-        for(i = 0; i < cp -> n; i++){
-            TNoLista *aux = cp -> vertices[i].direto;
+    if(g -> vertices != NULL){
+        
+        int vis[g -> n][g -> n];
+        
+        memset(vis, 0, sizeof vis); 
+        
+        for(i = 0; i < g -> n; i++){
+            TNoLista *aux = g -> vertices[i].direto;
             
             while(aux != NULL){
-                fprintf(arquivo, "E %d %d %lf %s", i, aux -> aresta.destino, aux -> aresta.peso, aux -> aresta.nome);
-                
-                int destino = aux -> aresta.destino;
+                if(!vis[i][aux -> aresta.destino] || !vis[aux -> aresta.destino][i]){
+                    fprintf(arquivo, "E %d %d %lf %s\n", i, aux -> aresta.destino, aux -> aresta.peso, aux -> aresta.rotulo);
+                    vis[i][aux -> aresta.destino] = vis[aux -> aresta.destino][i] = 1;
+                }
                 
                 aux = aux -> prox;
-                desconectar(cp, i, destino);
+            }
+        }
+    }
+    
+    return 1;
+}
+
+int debug_grafo_dimacs(TGrafo *g) {  
+    char dir = g -> direcionado == 1 ? 'D' : 'U' ;
+    int i;
+    
+    printf("G %c %d %d %s\n", dir, g -> n, g -> m, g -> nome);
+    
+    for(i = 0; i < g -> n; i++){
+        printf("N %d %lf %s\n", i, g -> vertices[i].peso, g -> vertices[i].rotulo);
+    }
+    
+    
+    if(g -> vertices != NULL){
+        
+        int vis[g -> n][g -> n];
+        
+        memset(vis, 0, sizeof vis); 
+        
+        for(i = 0; i < g -> n; i++){
+            TNoLista *aux = g -> vertices[i].direto;
+            
+            while(aux != NULL){
+                if(!vis[i][aux -> aresta.destino] || !vis[aux -> aresta.destino][i]){
+                    printf("E %d %d %lf %s\n", i, aux -> aresta.destino, aux -> aresta.peso, aux -> aresta.rotulo);
+                    vis[i][aux -> aresta.destino] = vis[aux -> aresta.destino][i] = 1;
+                }
+                
+                aux = aux -> prox;
             }
             
         }
@@ -70,9 +109,84 @@ int salva_grafo_dimacs(const TGrafo *g, FILE* arquivo) {
     return 1;
 }
 
+// Por enquanto só funciona com não orientado
+int debug_grafo_dot(const TGrafo *g) {
+    
+    if(g -> direcionado)
+        printf("digraph %s {\n", g -> nome);
+    else
+        printf("graph %s {\n", g -> nome);
+        
+    printf(" graph [fontsize = 36,\n\tlabel=\"\\n\\n%s - Autor: Celso A. Uliana Junior -- Sep 2018\",\n \tlabelloc=t]\n", g -> nome);
+    
+    for(int i = 0; i < g -> n; i++){
+        printf(" V%d [label=\"%s\\n%lf\"]\n", i, g -> vertices[i].rotulo, g -> vertices[i].peso);
+    }
+    
+    int vis[g -> n][g -> n];
+        
+    memset(vis, 0, sizeof vis); 
+        
+    for(int i = 0; i < g -> n; i++){
+        TNoLista *aux = g -> vertices[i].direto;
+            
+        while(aux != NULL){
+            if(!vis[i][aux -> aresta.destino] || !vis[aux -> aresta.destino][i]){
+                if(g -> direcionado)
+                    printf(" V%d -> V%d [label=\"%s\\n%lf\"]\n", i, aux -> aresta.destino, aux -> aresta.rotulo, aux -> aresta.peso);
+                else
+                    printf(" V%d -- V%d [label=\"%s\\n%lf\"]\n", i, aux -> aresta.destino, aux -> aresta.rotulo, aux -> aresta.peso);
+                vis[i][aux -> aresta.destino] = vis[aux -> aresta.destino][i] = 1;
+            }
+                
+            aux = aux -> prox;
+        }
+            
+    }
+    
+    printf("}\n");
+        
+    return 1;
+}
+
 // Salva um grafo no formato dot
+// Por enquanto só funciona com não orientado
 int salva_grafo_dot(const TGrafo *g, FILE* arquivo) {
-  // Coloque seu cÃ³digo aqui e substitua a linha abaixo por
-  // return 1 se tudo der certo.
-    return 0;
+    
+    if(g -> direcionado)
+        fprintf(arquivo, "digraph %s {\n", g -> nome);
+    else
+        fprintf(arquivo, "graph %s {\n", g -> nome);
+        
+    
+    fprintf(arquivo, " graph [fontsize = 36,\n\tlabel=\"\\n\\n%s - Autor: Celso A. Uliana Junior -- Sep 2018\",\n \tlabelloc=t]\n", g -> nome);
+    
+    for(int i = 0; i < g -> n; i++){
+        fprintf(arquivo, " V%d [label=\"%s\\n%lf\"]\n", i, g -> vertices[i].rotulo, g -> vertices[i].peso);
+    }
+    
+    int vis[g -> n][g -> n];
+        
+    memset(vis, 0, sizeof vis); 
+        
+    for(int i = 0; i < g -> n; i++){
+        TNoLista *aux = g -> vertices[i].direto;
+            
+        while(aux != NULL){
+            if(!vis[i][aux -> aresta.destino] || !vis[aux -> aresta.destino][i]){
+                if(g -> direcionado)
+                    fprintf(arquivo, " V%d -> V%d [label=\"%s\\n%lf\"]\n", i, aux -> aresta.destino, aux -> aresta.rotulo, aux -> aresta.peso);
+                else
+                    fprintf(arquivo, " V%d -- V%d [label=\"%s\\n%lf\"]\n", i, aux -> aresta.destino, aux -> aresta.rotulo, aux -> aresta.peso);
+                vis[i][aux -> aresta.destino] = vis[aux -> aresta.destino][i] = 1;
+            }
+                
+            aux = aux -> prox;
+        }
+            
+    }
+    
+    fprintf(arquivo, "}\n");
+    
+    return 1;
 }
