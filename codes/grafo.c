@@ -28,13 +28,6 @@ int init_graph(TGrafo *g, TId n, char *nome, int direcionado) {
     return 1;
 }
 
-// Dá um nome pra um vertice u
-void set_nome_vertice(TGrafo *g, TId u, char *nome){
-    if(u >= 0 && u <= g -> n)
-        g -> vertices[u].rotulo = nome;
-        
-}
-
 // Funcao preencher TNoLista.
 void fill(TNoLista *cur, TId destino, TPeso peso, char *rotulo){
     cur -> aresta.destino = destino;
@@ -75,7 +68,6 @@ static int finaliza_lista(TNoLista *lista) {
         lista = lista -> prox;
         free(cur);
         cur -> prox = NULL;
-
     }
 
     lista = NULL;
@@ -143,7 +135,7 @@ TNoLista * aresta(const TGrafo *g, TId u, TId v, int direcao){
 
     else{
         
-        
+        // Recebe a referencia a lista direita ou reversa, de acordo com parametro
         TNoLista *cur = direcao == 0 ? g -> vertices[u].direto : g -> vertices[u].reverso;
         TNoLista *next;
 
@@ -170,15 +162,14 @@ TNoLista * aresta(const TGrafo *g, TId u, TId v, int direcao){
     }
 }
 
-// Remove uma aresta do grafo. Retorna falso se a aresta nao foi encontrada.
+// Remove uma aresta do grafo. Retorna 0 se a aresta nao foi encontrada.
 int desconectar(TGrafo *g, TId u, TId v){
 
     if(is_invalid(g, u, v))
-        return 0;
-    
+        return 0;   
     
     else{
-        
+        //Remove a aresta U a V
         TNoLista *cur = aresta(g, u, v, 0);
          
         if(cur == NULL){
@@ -198,6 +189,7 @@ int desconectar(TGrafo *g, TId u, TId v){
         
         g -> vertices[u].grauSaida--;
         
+        //Remove a aresta reversa V a U
         if(g -> direcionado){
     
             TNoLista *reverse_cur = aresta(g, v, u, 1);
@@ -220,6 +212,7 @@ int desconectar(TGrafo *g, TId u, TId v){
             g -> vertices[v].grauEntrada--;
         }
         
+        //Remove a aresta direita V a U
         else{
 
             TNoLista *reverse_cur = aresta(g, v, u, 0);
@@ -301,14 +294,8 @@ const TAresta * conectar(TGrafo *g, TId u, TId v) {
     return conectarPeso(g, u, v, 0, NULL);
 }
 
-const TAresta * conectar(TGrafo *g, TId u, TId v, TPeso peso, char *nome) {
-    return conectarPeso(g, u, v, peso, nome);
-}
-
-
 // Altera o nome e o peso de uma aresta existente. Retorna NULL se não houver aresta.
 TAresta * alteraPeso(TGrafo *g, TId u, TId v, TPeso peso, char *rotulo){
-    
     
     if(is_invalid(g, u, v))
         return NULL;
@@ -413,51 +400,13 @@ void debug_graph(TGrafo *g){
 
 int main(){
     //main de teste para grafo.c
-
     TGrafo *g;
 
-    g = create_graph(5, (char*) "Casa", 1);
-    set_nome_vertice(g, 0, (char*)"I1");
-    set_nome_vertice(g, 1, (char*)"I2");
-    set_nome_vertice(g, 2, (char*)"I3");
-    set_nome_vertice(g, 3, (char*)"I4");
-    set_nome_vertice(g, 4, (char*)"I5");
-    
-    conectar(g, 0, 1, 0, (char*)"P1");
-    conectar(g, 1, 2, 0, (char*)"P2");
-    conectar(g, 2, 3, 0, (char*)"P3");
-    conectar(g, 3, 4, 0, (char*)"P4");
-    conectar(g, 4, 0, 0, (char*)"P5");
-    conectar(g, 1, 4, 0, (char*)"TETO");
-    
-    
+    g = debug_le_grafo_dimacs(g);
+
     debug_grafo_dimacs(g);
     printf("\n\n");
     debug_grafo_dot(g);
-    
-    //desconectar(g, 0, 1);
-    //desconectar(g, 0, 2);
-    //desconectar(g, 0, 3);
-    //desconectar(g, 4, 9);
-
-    //alteraPeso(g, 0, 1, 5.0, (char*)"nome bacana");
-    //alteraPeso(g, 0, 2, 10.0, (char*)"nome bacana2");
-    //alteraPeso(g, 0, 3, 10000.0, (char*)"nome bacana2123123");
-    //alteraPeso(g, 4, 0, 123123123.0, (char*)"julinho sdds");
-
-
-    TNoLista *aux = aresta(g, 0, 7, 0);
-
-    if(aux != NULL){
-        printf("achou %d\n", aux -> prox -> aresta.destino);
-    }
-    else{
-        if(g -> vertices[0].direto != NULL && g -> vertices[0].direto -> aresta.destino == 7){
-            printf("achou %d\n", g -> vertices[0].direto -> aresta.destino);
-        }
-    }
-
-    //debug_graph(g);
 
     destroi_grafo(g);
 }

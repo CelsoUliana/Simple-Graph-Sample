@@ -10,11 +10,52 @@
 //   - Um ponteiro NULL, caso em que o grafo serrÃ¡ criado e retornado.
 // TODO: contar arestas e conferir
 TGrafo * le_grafo_dimacs(TGrafo *g, FILE* arquivo) {
-    int n, m, dir, aux, sai, chega;
-    char c, *p, *nome;
-    double peso;
+    int n, m, dir;
+    char d, *p = (char*) malloc (255 * sizeof(char));;
+
     
-    fscanf(arquivo ,"%c %c %d %d %s", &c, &c, &n, &m, p);
+    fscanf(arquivo, "%c %c %d %d %s\n", &d, &d, &n, &m, p);
+    
+    dir = d == 'U' ? 0 : 1;
+    
+    if(g == NULL)
+        g = create_graph(n, p, dir);
+        
+    else
+        init_graph(g, n, p, dir);
+    
+    for(int i = 0; i < n; i++){
+        int aux = 0;
+        double peso = 0;
+        char c, *nome = (char*) malloc(255 * sizeof(char));;
+        
+        fscanf(arquivo, "%c %d %lf %s\n", &c, &aux, &peso, nome);
+        g -> vertices[i].peso = peso;
+        g -> vertices[i].rotulo = nome;
+    }
+    
+    
+    
+    for(int i = 0; i < m; i++){
+        int sai, chega;
+        char c, *nome = (char*) malloc(255 * sizeof(char));
+        float peso = 0;
+        
+        fscanf(arquivo, "%c %d %d %f %s\n", &c, &sai, &chega, &peso, nome);
+        conectarPeso(g, sai, chega, peso, nome);
+    }
+    
+    return g;
+}
+
+TGrafo * debug_le_grafo_dimacs(TGrafo *g) {
+    int n, m, dir;
+    char d, *p = (char*) malloc (255 * sizeof(char));;
+
+    
+    scanf("%c %c %d %d %s\n", &d, &d, &n, &m, p);
+    
+    dir = d == 'U' ? 0 : 1;
     
     if(g == NULL)
         g = create_graph(n, p, dir);
@@ -22,21 +63,29 @@ TGrafo * le_grafo_dimacs(TGrafo *g, FILE* arquivo) {
     else
         init_graph(g, n, p, dir); // & ou não?
     
-    
     for(int i = 0; i < n; i++){
-        fscanf(arquivo, "%c %d %lf %s", &c, &aux, &peso, nome);
+        int aux = 0;
+        double peso = 0;
+        char c, *nome = (char*) malloc(255 * sizeof(char));;
         
-        g -> vertices[aux].peso = peso;
-        g -> vertices[aux].rotulo = nome;
+        scanf("%c %d %lf %s\n", &c, &aux, &peso, nome);
+        g -> vertices[i].peso = peso;
+        g -> vertices[i].rotulo = nome;
     }
     
+    
+    
     for(int i = 0; i < m; i++){
-        fscanf(arquivo, "%c %d %d %lf %s", &c, &sai, &chega, &peso, nome);
+        int sai, chega;
+        char c, *nome = (char*) malloc(255 * sizeof(char));
+        float peso = 0;
+        
+        scanf("%c %d %d %f %s\n", &c, &sai, &chega, &peso, nome);
+       // printf("%d %d %s\n", sai, chega, nome);
         conectarPeso(g, sai, chega, peso, nome);
     }
     
-  
-    return NULL;
+    return g;
 }
 
 // Salva um grafo no formato DIMACS

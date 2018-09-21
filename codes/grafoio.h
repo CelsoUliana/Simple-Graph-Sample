@@ -11,6 +11,9 @@
 //   - Um ponteiro NULL, caso em que o grafo serrá criado e retornado.
 TGrafo * le_grafo_dimacs(TGrafo *g, FILE* arquivo);
 
+// Debug a leitura dimacs
+TGrafo * debug_le_grafo_dimacs(TGrafo *g)
+
 // Salva um grafo no formato DIMACS
 int salva_grafo_dimacs(const TGrafo *g, FILE* arquivo);
 

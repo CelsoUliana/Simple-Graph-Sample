@@ -91,4 +91,7 @@ const TAresta * conectarPeso(TGrafo *g, TId u, TId v, TPeso peso, char *rotulo);
 // Altera o peso de uma aresta existente. Retorna NULL se não houver aresta.
 TAresta * alteraPeso(TGrafo *g, TId u, TId v, TPeso peso, char *rotulo);
 
+// Funcao auxiliar de printar o grafo.
+void debug_graph(TGrafo *g);
+
 #endif
