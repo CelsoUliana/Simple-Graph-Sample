@@ -48,6 +48,7 @@ TGrafo * le_grafo_dimacs(TGrafo *g, FILE* arquivo) {
     return g;
 }
 
+// Funcao de debugar le_grafo_dimacs
 TGrafo * debug_le_grafo_dimacs(TGrafo *g) {
     int n, m, dir;
     char d, *p = (char*) malloc (255 * sizeof(char));;
@@ -123,6 +124,7 @@ int salva_grafo_dimacs(TGrafo *g, FILE* arquivo) {
     return 1;
 }
 
+// Funcao auxiliar de grafo_dimacs
 int debug_grafo_dimacs(TGrafo *g) {  
     char dir = g -> direcionado == 1 ? 'D' : 'U' ;
     int i;
@@ -158,7 +160,7 @@ int debug_grafo_dimacs(TGrafo *g) {
     return 1;
 }
 
-// Por enquanto só funciona com não orientado
+// Por enquanto só funciona com não orientado(?talvez)
 int debug_grafo_dot(const TGrafo *g) {
     
     if(g -> direcionado)
@@ -199,7 +201,7 @@ int debug_grafo_dot(const TGrafo *g) {
 }
 
 // Salva um grafo no formato dot
-// Por enquanto só funciona com não orientado
+// Por enquanto só funciona com não orientado (?talvez)
 int salva_grafo_dot(const TGrafo *g, FILE* arquivo) {
     
     if(g -> direcionado)
