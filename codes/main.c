@@ -4,11 +4,11 @@
 #include "grafoio.h"
 
 enum COMANDOS {
-    DESCONHECIDO=0,
-    COPIAR=1,
-    DESENHAR=2,
-    GRAUMAX=3,
-    GRAUMIN=4
+    DESCONHECIDO    = 0,
+    COPIAR          = 1,
+    DESENHAR        = 2,
+    GRAUMAX         = 3,
+    GRAUMIN         = 4
 };
 
 /* 
@@ -36,7 +36,7 @@ void lista_grau_min(const TGrafo *g, FILE *saida) {
 
     for (i = 0; i < g -> n; i++) {
 
-        TId grauv = g -> grauVertice(g, i);
+        TId grauv = grauVertice(g, i);
 
         if (grauv == gmin)
             fprintf(saida, "%d ", i);
@@ -51,13 +51,15 @@ com o grau máximo.
 Se orientado, considerar a soma dos graus de entrada e saída.
 */
 void lista_grau_max(const TGrafo *g, FILE *saida) {
-
-    TId gmax = 2 * g -> n;
+    // Inicializa o grau com um número pequeno demais (o minimo).
+    // Se for orientado pode haver uma aresta chegando e uma saindo
+    // de cada vértice.
+    TId gmax = 0;
     TId i;
 
     for(i = 0; i < g -> n; i++){
        
-        TId grauv = g -> grauVertice(g, i);
+        TId grauv = grauVertice(g, i);
 
         if(grauv > gmax)
             gmax = grauv;
@@ -68,7 +70,7 @@ void lista_grau_max(const TGrafo *g, FILE *saida) {
 
     for (i = 0; i < g -> n; i++) {
 
-        TId grauv = g -> grauVertice(g, i);
+        TId grauv = grauVertice(g, i);
 
         if (grauv == gmax)
             fprintf(saida, "%d ", i);

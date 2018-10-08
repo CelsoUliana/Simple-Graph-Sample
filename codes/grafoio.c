@@ -9,8 +9,8 @@
 // inicializado para o tamanho obtido do arquivo.
 //   - Um ponteiro NULL, caso em que o grafo serrÃ¡ criado e retornado.
 // TODO: contar arestas e conferir
-TGrafo * le_grafo_dimacs(TGrafo *g, FILE* arquivo) {
-    int n, m, dir;
+TGrafo * le_grafo_dimacs(TGrafo *g, FILE* arquivo){
+    int n, m, dir, flag = 0;
     char d, *p = (char*) malloc (255 * sizeof(char));;
 
     
@@ -22,7 +22,7 @@ TGrafo * le_grafo_dimacs(TGrafo *g, FILE* arquivo) {
         g = create_graph(n, p, dir);
         
     else
-        init_graph(g, n, p, dir);
+        flag = init_graph(g, n, p, dir);
     
     for(int i = 0; i < n; i++){
         int aux = 0;
@@ -49,7 +49,7 @@ TGrafo * le_grafo_dimacs(TGrafo *g, FILE* arquivo) {
 }
 
 // Funcao de debugar le_grafo_dimacs
-TGrafo * debug_le_grafo_dimacs(TGrafo *g) {
+TGrafo * debug_le_grafo_dimacs(TGrafo *g){
     int n, m, dir;
     char d, *p = (char*) malloc (255 * sizeof(char));;
 
@@ -90,7 +90,7 @@ TGrafo * debug_le_grafo_dimacs(TGrafo *g) {
 }
 
 // Salva um grafo no formato DIMACS
-int salva_grafo_dimacs(TGrafo *g, FILE* arquivo) {  
+int salva_grafo_dimacs(TGrafo *g, FILE* arquivo){  
     char dir = g -> direcionado == 1 ? 'D' : 'U' ;
     int i;
     
@@ -109,11 +109,20 @@ int salva_grafo_dimacs(TGrafo *g, FILE* arquivo) {
         
         for(i = 0; i < g -> n; i++){
             TNoLista *aux = g -> vertices[i].direto;
-            
+
             while(aux != NULL){
-                if(!vis[i][aux -> aresta.destino] || !vis[aux -> aresta.destino][i]){
-                    fprintf(arquivo, "E %d %d %lf %s\n", i, aux -> aresta.destino, aux -> aresta.peso, aux -> aresta.rotulo);
-                    vis[i][aux -> aresta.destino] = vis[aux -> aresta.destino][i] = 1;
+                if(g -> direcionado){
+                    if(!vis[i][aux -> aresta.destino]){
+                        fprintf(arquivo, "E %d %d %lf %s\n", i, aux -> aresta.destino, aux -> aresta.peso, aux -> aresta.rotulo);
+                        vis[i][aux -> aresta.destino] = 1;
+                    }
+                }
+                
+                else{
+                    if(!vis[i][aux -> aresta.destino] || !vis[aux -> aresta.destino][i]){
+                        fprintf(arquivo, "E %d %d %lf %s\n", i, aux -> aresta.destino, aux -> aresta.peso, aux -> aresta.rotulo);
+                        vis[i][aux -> aresta.destino] = vis[aux -> aresta.destino][i] = 1;
+                    }
                 }
                 
                 aux = aux -> prox;
@@ -125,7 +134,7 @@ int salva_grafo_dimacs(TGrafo *g, FILE* arquivo) {
 }
 
 // Funcao auxiliar de grafo_dimacs
-int debug_grafo_dimacs(TGrafo *g) {  
+int debug_grafo_dimacs(TGrafo *g){  
     char dir = g -> direcionado == 1 ? 'D' : 'U' ;
     int i;
     
@@ -146,9 +155,18 @@ int debug_grafo_dimacs(TGrafo *g) {
             TNoLista *aux = g -> vertices[i].direto;
             
             while(aux != NULL){
-                if(!vis[i][aux -> aresta.destino] || !vis[aux -> aresta.destino][i]){
-                    printf("E %d %d %lf %s\n", i, aux -> aresta.destino, aux -> aresta.peso, aux -> aresta.rotulo);
-                    vis[i][aux -> aresta.destino] = vis[aux -> aresta.destino][i] = 1;
+                if(g -> direcionado){
+                    if(!vis[i][aux -> aresta.destino]){
+                        printf("E %d %d %lf %s\n", i, aux -> aresta.destino, aux -> aresta.peso, aux -> aresta.rotulo);
+                        vis[i][aux -> aresta.destino] = 1;
+                    }
+                }
+                
+                else{
+                    if(!vis[i][aux -> aresta.destino] || !vis[aux -> aresta.destino][i]){
+                        printf("E %d %d %lf %s\n", i, aux -> aresta.destino, aux -> aresta.peso, aux -> aresta.rotulo);
+                        vis[i][aux -> aresta.destino] = vis[aux -> aresta.destino][i] = 1;
+                    }
                 }
                 
                 aux = aux -> prox;
@@ -161,7 +179,7 @@ int debug_grafo_dimacs(TGrafo *g) {
 }
 
 // Por enquanto só funciona com não orientado(?talvez)
-int debug_grafo_dot(const TGrafo *g) {
+int debug_grafo_dot(const TGrafo *g){
     
     if(g -> direcionado)
         printf("digraph %s {\n", g -> nome);
@@ -182,12 +200,19 @@ int debug_grafo_dot(const TGrafo *g) {
         TNoLista *aux = g -> vertices[i].direto;
             
         while(aux != NULL){
-            if(!vis[i][aux -> aresta.destino] || !vis[aux -> aresta.destino][i]){
-                if(g -> direcionado)
+            
+            if(g -> direcionado){
+                if(!vis[i][aux -> aresta.destino]){
                     printf(" V%d -> V%d [label=\"%s\\n%lf\"]\n", i, aux -> aresta.destino, aux -> aresta.rotulo, aux -> aresta.peso);
-                else
+                    vis[i][aux -> aresta.destino] = 1;
+                }
+            }
+            
+            else{
+                if(!vis[i][aux -> aresta.destino] || !vis[aux -> aresta.destino][i]){
                     printf(" V%d -- V%d [label=\"%s\\n%lf\"]\n", i, aux -> aresta.destino, aux -> aresta.rotulo, aux -> aresta.peso);
-                vis[i][aux -> aresta.destino] = vis[aux -> aresta.destino][i] = 1;
+                    vis[i][aux -> aresta.destino] = vis[aux -> aresta.destino][i] = 1;
+                }
             }
                 
             aux = aux -> prox;
@@ -202,7 +227,7 @@ int debug_grafo_dot(const TGrafo *g) {
 
 // Salva um grafo no formato dot
 // Por enquanto só funciona com não orientado (?talvez)
-int salva_grafo_dot(const TGrafo *g, FILE* arquivo) {
+int salva_grafo_dot(const TGrafo *g, FILE* arquivo){
     
     if(g -> direcionado)
         fprintf(arquivo, "digraph %s {\n", g -> nome);
@@ -224,12 +249,19 @@ int salva_grafo_dot(const TGrafo *g, FILE* arquivo) {
         TNoLista *aux = g -> vertices[i].direto;
             
         while(aux != NULL){
-            if(!vis[i][aux -> aresta.destino] || !vis[aux -> aresta.destino][i]){
-                if(g -> direcionado)
+            
+            if(g -> direcionado){
+                if(!vis[i][aux -> aresta.destino]){
                     fprintf(arquivo, " V%d -> V%d [label=\"%s\\n%lf\"]\n", i, aux -> aresta.destino, aux -> aresta.rotulo, aux -> aresta.peso);
-                else
+                    vis[i][aux -> aresta.destino] = 1;
+                }
+            }
+            
+            else{
+                if(!vis[i][aux -> aresta.destino] || !vis[aux -> aresta.destino][i]){
                     fprintf(arquivo, " V%d -- V%d [label=\"%s\\n%lf\"]\n", i, aux -> aresta.destino, aux -> aresta.rotulo, aux -> aresta.peso);
-                vis[i][aux -> aresta.destino] = vis[aux -> aresta.destino][i] = 1;
+                    vis[i][aux -> aresta.destino] = vis[aux -> aresta.destino][i] = 1;
+                }
             }
                 
             aux = aux -> prox;

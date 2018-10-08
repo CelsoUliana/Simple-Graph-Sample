@@ -397,16 +397,3 @@ void debug_graph(TGrafo *g){
         }
     }
 }
-
-int main(){
-    //main de teste para grafo.c
-    TGrafo *g;
-
-    g = debug_le_grafo_dimacs(g);
-
-    debug_grafo_dimacs(g);
-    printf("\n\n");
-    debug_grafo_dot(g);
-
-    destroi_grafo(g);
-}

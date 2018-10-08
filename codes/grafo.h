@@ -51,7 +51,7 @@ void fill(TNoLista *cur, TId destino, TPeso peso, char *rotulo);
 int is_invalid(const TGrafo *g, TId v, TId u);
 
 // Inicializa um grafo para conter n vértices e m arestas.
-int init_graph(TGrafo *g, TId n, char *nome, int direcionado)
+int init_graph(TGrafo *g, TId n, char *nome, int direcionado);
 
 // Desaloca todas as estruturas relacionadas ao grafo.
 int finaliza_grafo(TGrafo *g);
