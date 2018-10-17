@@ -14,4 +14,7 @@ gcc -o prim *.o
 
 Run:
 
-```./prim```
+```./prim [Command]```
+
+
+Sample structure and usage provided by teacher Vagner Pedrotti.
