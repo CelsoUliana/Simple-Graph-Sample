@@ -1,189 +1,190 @@
+/*
+**   Celso Antonio Uliana Junior,
+**   April 2019
+*/
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "grafoio.h"
+#include "graphio.h"
 
-enum COMANDOS {
-    DESCONHECIDO    = 0,
-    COPIAR          = 1,
-    DESENHAR        = 2,
-    GRAUMAX         = 3,
-    GRAUMIN         = 4
+enum COMMANDS {
+    UNKNOWN         = 0,
+    COPY            = 1,
+    DRAW            = 2,
+    MAXDEGREE       = 3,
+    MINDEGREE       = 4
 };
 
 /* 
-Descobrir o grau mínimo do grafo e listar todos os vértices
-com o grau mínimo.
-Se orientado, considerar a soma dos graus de entrada e saída.
+Find the minimum degree of the graph and list all vertices
+with the minimum degree.
+If graph is directed, consider the sum of exit and entry degrees.
 */
-void lista_grau_min(const TGrafo *g, FILE *saida) {
-    // Inicializa o grau com um número grande demais (nenhum vértice é vizinho
-    // de todos). Se for orientado pode haver uma aresta chegando e uma saindo
-    // de cada vértice.
+void findMinimumDegree(const TGraph *g, FILE *handler) {
+    // Initialize the degree with a number too big 
+    // (none vertex is neighbor to all). If graph is directed can be an edge
+    // exiting and other arriving at each vertex. 
     TId gmin = 2 * g -> n;
     TId i;
 
-    // Procura por vértices de grau menor.
+    // Search for vertices of lower degree.
     for (i = 0; i < g -> n; i++) {
 
-        TId grauv = grauVertice(g, i);
+        TId degreev = vertexDegree(g, i);
 
-        if (grauv < gmin)
-            gmin = grauv;
+        if (degreev < gmin)
+            gmin = degreev;
     }
   
-    fprintf(saida, "Grau mínimo: %d. Vértices: ", gmin);
+    fprintf(handler, "Minimum degree: %d. Vertices: ", gmin);
 
     for (i = 0; i < g -> n; i++) {
 
-        TId grauv = grauVertice(g, i);
+        TId degreev = vertexDegree(g, i);
 
-        if (grauv == gmin)
-            fprintf(saida, "%d ", i);
+        if (degreev == gmin)
+            fprintf(handler, "%d ", i);
     }
 
-    fprintf(saida, ".\n");
+    fprintf(handler, ".\n");
 }
 
 /* 
-Descobrir o grau máximo do grafo e listar todos os vértices
-com o grau máximo.
-Se orientado, considerar a soma dos graus de entrada e saída.
+Find the maximum degree of the graph and list all vertices
+with the maximum degree.
+If graph is directed, consider the sum of exit and entry degrees.
 */
-void lista_grau_max(const TGrafo *g, FILE *saida) {
-    // Inicializa o grau com um número pequeno demais (o minimo).
-    // Se for orientado pode haver uma aresta chegando e uma saindo
-    // de cada vértice.
+void findMaximumDegree(const TGraph *g, FILE *handler) {
+    // Initialize the degree with a number too low (the minimum).
+    // If graph is directed can be an edge
+    // exiting and other arriving at each vertex. 
     TId gmax = 0;
     TId i;
 
     for(i = 0; i < g -> n; i++){
        
-        TId grauv = grauVertice(g, i);
+        TId degreev = vertexDegree(g, i);
 
-        if(grauv > gmax)
-            gmax = grauv;
+        if(degreev > gmax)
+            gmax = degreev;
     }
 
-    fprintf(saida, "Grau mínimo: %d. Vértices: ", gmax);
-
+    fprintf(handler, "Maximum degree: %d. Vertices: ", gmax);
 
     for (i = 0; i < g -> n; i++) {
 
-        TId grauv = grauVertice(g, i);
+        TId degreev = vertexDegree(g, i);
 
-        if (grauv == gmax)
-            fprintf(saida, "%d ", i);
+        if (degreev == gmax)
+            fprintf(handler, "%d ", i);
     }
 
-    fprintf(saida, ".\n");
-
+    fprintf(handler, ".\n");
 }
 
-// Imprime mensagem de uso, usada em caso de problema nos argumentos.
-void imprime_uso(char **argv) {
-    fprintf(stderr, "Uso: %s comando entrada.gr [saida.gr]\n", argv[0]);
-    fprintf(stderr, "Comandos:\n\tcopiar : Copia o grafo de entrada para saída.\n"
-	  "\tdesenhar : Gera um desenho do grafo no formato dot no arquivo de saída.\n"
-	  "\tgraumax : Imprime os vértices com grau máximo.\n"
-	  "\tgraumin : Imprime os vértices com grau mínimo.\n");
+// Print message of use, when there is a problem in args.
+void printUse(char **argv) {
+    fprintf(stderr, "\nUsage: %s command input.gr [output.gr]\n", argv[0]);
+    fprintf(stderr, "Commands:\n\tcopy      : Copy the input graph to output.\n"
+	  "\tdraw      : generate a draw of the graph in format dot in exit file.\n"
+	  "\tmaxdegree : print the vertices with the maximum degree.\n"
+	  "\tmindegree : print the vertices with the minumum degree.\n");
 }
 
-// Aqui tudo começa.
 int main (int argc, char **argv) {
 
     if (argc < 3) {
-        imprime_uso(argv);
+        printUse(argv);
         return 1;
     }
 
-    // A string de comando digitada pelo usuário
-    char *scomando = argv[1];
-    int comando = DESCONHECIDO;
+    // Command string typed by user.
+    char *scommand = argv[1];
+    int command = UNKNOWN;
 
-    // Identifica um dos comandos reconhecidos
-    if (strcmp(scomando, "copiar") == 0)
-        comando=COPIAR;
-    else if (strcmp(scomando, "desenhar") == 0)
-        comando=DESENHAR;
-    else if (strcmp(scomando, "graumax") == 0)
-        comando=GRAUMAX;
-    else if (strcmp(scomando, "graumin") == 0)
-        comando=GRAUMIN;
+    // Identify the known commands.
+    if (strcmp(scommand, "copy") == 0)
+        command = COPY;
+    else if (strcmp(scommand, "draw") == 0)
+        command = DRAW;
+    else if (strcmp(scommand, "maxdegree") == 0)
+        command = MAXDEGREE;
+    else if (strcmp(scommand, "mindegree") == 0)
+        command = MINDEGREE;
 
-    // Verifica se o comando é conhecido
-    if (comando == 0) {
-        fprintf(stderr, "Comando desconhecido: %s .\n", argv[1]);
-        imprime_uso(argv);
+    // Verify if the command is known.
+    if (command == 0) {
+        fprintf(stderr, "unknown command: %s .\n", argv[1]);
+        printUse(argv);
         return 1;
     }
 
-    // Verifica se o comando tem os argumentos corretos
-    if (((comando == COPIAR) || (comando == DESENHAR)) && argc < 4) {
-        fprintf(stderr, "Comando requer um arquivo de saída.\n");
-        imprime_uso(argv);
+    // Verify if command has correct arguments.
+    if (((command == COPY) || (command == DRAW)) && argc < 4) {
+        fprintf(stderr, "Command requires an exit file.\n");
+        printUse(argv);
         return 1;
     }
 
-    // Abre aquivo de entrada para leitura.
-    FILE *entrada = fopen(argv[2], "r");
-    if (entrada == NULL) {
-        fprintf(stderr, "Falha ao abrir arquivo de entrada: %s .\n", argv[2]);
+    // Open the input file for reading.
+    FILE *input = fopen(argv[2], "r");
+    if (input == NULL) {
+        fprintf(stderr, "Failure to open input file. %s .\n", argv[2]);
         return 2;
     }
 
-    // Le o grafo de entrada no formado DIMACS.
-    TGrafo *g = NULL;
+    // Read the entry graph in DIMACS format.
+    TGraph *g = NULL;
     int res;
-    g = le_grafo_dimacs(g, entrada);
-    fclose(entrada);
+    g = readGraphDimacs(g, input);
+    fclose(input);
 
     if (g == NULL) {
-        fprintf(stderr, "Falha ao ler grafo.\n");
+        fprintf(stderr, "Failure in reading graph.\n");
         return 2;
     }
 
-    // Abre aquivo de saída, se necessário.
-    FILE *saida;
-    if (comando == COPIAR || comando == DESENHAR) {
-        saida = fopen(argv[3], "w");
-        if (saida == NULL) {
-        fprintf(stderr, "Falha ao abrir arquivo de saída: %s.\n", argv[3]);
-        destroi_grafo(g);
-        return 3;
+    // Open output file, if necessary.
+    FILE *output;
+    if (command == COPY || command == DRAW) {
+        output = fopen(argv[3], "w");
+        if (output == NULL) {
+            fprintf(stderr, "Failure to open output file. %s.\n", argv[3]);
+            destroyGraph(g);
+            return 3;
         }
     } 
 
     else {
-        saida = stdout;
+        output = stdout;
     }
 
-    // Executa o comando
-    switch (comando) {
-    case COPIAR:
-        res = salva_grafo_dimacs(g, saida);
-        fclose(saida);
+    // Execute the command.
+    switch (command) {
+    case COPY:
+        res = saveGraphDimacs(g, output);
+        fclose(output);
         break;
-    case DESENHAR:
-        res = salva_grafo_dot(g, saida);
-        fclose(saida);
+    case DRAW:
+        res = saveGraphDot(g, output);
+        fclose(output);
         break;
-    case GRAUMAX:
-        lista_grau_max(g, saida);
+    case MAXDEGREE:
+        findMaximumDegree(g, output);
         res = 1;
         break;
-    case GRAUMIN:
-        lista_grau_min(g, saida);
-        res=1;
+    case MINDEGREE:
+        findMinimumDegree(g, output);
+        res = 1;
         break;
     }
 
-    // Libera o grafo.
-    destroi_grafo(g);
+    // Free the graph
+    destroyGraph(g);
     g = NULL;
 
     if (!res) {
-        fprintf(stderr, "Falha ao executar comando.\n");
+        fprintf(stderr, "Failure to execute command.\n");
         return 4;
     }
 

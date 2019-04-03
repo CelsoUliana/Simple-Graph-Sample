@@ -1,2 +1,3 @@
 codes/old/
-old/
+codes/*.o
+codes/*.exe
