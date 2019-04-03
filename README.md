@@ -7,8 +7,8 @@ Compile:
 
 ```
 gcc -c -g -o main.o main.c
-gcc -c -g -o grafoio.o grafoio.c
-gcc -c -g -o grafo.o grafo.c
+gcc -c -g -o graphio.o graphio.c
+gcc -c -g -o graph.o graph.c
 gcc -o prim *.o
 ```
 
