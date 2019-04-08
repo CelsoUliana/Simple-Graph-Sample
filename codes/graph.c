@@ -6,41 +6,41 @@
 #include <stdio.h>
 #include "graph.h"
 
-TId countEdges(const TGraph *g) {
+TId countEdges(const TGraph * g) {
     return g -> m;
 }
 
-TId countVertices(const TGraph *g) {
+TId countVertices(const TGraph * g) {
     return g -> n;
 }
 
-TId vertexDegree(const TGraph *g, TId u){
+TId vertexDegree(const TGraph * g, TId u){
     return vertexExitDegree(g, u) + vertexEntryDegree(g, u);
 }
 
-TId vertexExitDegree(const TGraph *g, TId u){
+TId vertexExitDegree(const TGraph * g, TId u){
     return g -> vertices[u].exitDegree;
 }
 
-TId vertexEntryDegree(const TGraph *g, TId u){
+TId vertexEntryDegree(const TGraph * g, TId u){
     return g -> vertices[u].entryDegree;
 }
 
-void fillNodeList(TNodeList *cur, TId destination, TWeight weight, char *label){
+void fillNodeList(TNodeList * cur, TId destination, TWeight weight, char * label){
     cur -> edge.label = label;
     cur -> edge.weight = weight;
     cur -> edge.destination = destination;
 }
 
-const char *getName(const TGraph *g) {
+const char * getName(const TGraph * g) {
     return g -> name;
 }
 
-int isInvalid(const TGraph *g, TId v, TId u){
+int isInvalid(const TGraph * g, TId v, TId u){
     return g -> n == 0 || g -> vertices == NULL || v >= g -> n || u >= g -> n;
 }
 
-TGraph * createGraph(TId n, char* name, int directed) {
+TGraph * createGraph(TId n, char * name, int directed) {
 
     TGraph * g = (TGraph *) malloc (sizeof(TGraph));
 
@@ -56,7 +56,7 @@ TGraph * createGraph(TId n, char* name, int directed) {
     }
 }
 
-int initGraph(TGraph *g, TId n, char *name, int directed) {
+int initGraph(TGraph * g, TId n, char * name, int directed) {
     g -> vertices = (TVertex *) malloc (sizeof(TVertex[n]));
 
     if (g -> vertices == NULL)
@@ -80,7 +80,7 @@ int initGraph(TGraph *g, TId n, char *name, int directed) {
     return 1;
 }
 
-void destroyGraph(TGraph *g) {
+void destroyGraph(TGraph * g) {
     finalizeGraphStructures(g);
 
     free(g -> vertices);
@@ -90,7 +90,7 @@ void destroyGraph(TGraph *g) {
     g = NULL;
 }
 
-int finalizeGraphStructures(TGraph *g) {
+int finalizeGraphStructures(TGraph * g) {
 
     int i;
     for (i = 0; i < g -> n; i++) {
@@ -102,9 +102,9 @@ int finalizeGraphStructures(TGraph *g) {
 
 }
 
-int finalizeEdgeList(TNodeList *list) {
+int finalizeEdgeList(TNodeList * list) {
 
-    TNodeList *cur;
+    TNodeList * cur;
 
     while(list != NULL){
         cur = list;
@@ -118,7 +118,7 @@ int finalizeEdgeList(TNodeList *list) {
     return 1;
 }
 
-TNodeList * edge(const TGraph *g, TId u, TId v, int directed){
+TNodeList * edge(const TGraph * g, TId u, TId v, int directed){
 
     if(isInvalid(g, u, v))
         return NULL;
@@ -126,8 +126,8 @@ TNodeList * edge(const TGraph *g, TId u, TId v, int directed){
     else{
         
         // Recebe a referencia a lista direita ou reversa, de acordo com parametro
-        TNodeList *cur = directed == 0 ? g -> vertices[u].direct : g -> vertices[u].reverse;
-        TNodeList *next;
+        TNodeList * cur = directed == 0 ? g -> vertices[u].direct : g -> vertices[u].reverse;
+        TNodeList * next;
 
         if(cur == NULL){
             return NULL;
@@ -152,14 +152,14 @@ TNodeList * edge(const TGraph *g, TId u, TId v, int directed){
     }
 }
 
-int disconnect(TGraph *g, TId u, TId v){
+int disconnect(TGraph * g, TId u, TId v){
 
     if(isInvalid(g, u, v))
         return 0;   
     
     else{
         // Remove the edge u, v.
-        TNodeList *cur = edge(g, u, v, 0);
+        TNodeList * cur = edge(g, u, v, 0);
          
         if(cur == NULL){
             if(g -> vertices[u].direct != NULL 
@@ -170,7 +170,7 @@ int disconnect(TGraph *g, TId u, TId v){
 
         if(cur != NULL){
             if(cur -> next != NULL){
-                TNodeList *del = cur -> next;
+                TNodeList * del = cur -> next;
                 cur -> next = cur -> next -> next;
                 free(del);
                 del = cur = NULL;
@@ -182,7 +182,7 @@ int disconnect(TGraph *g, TId u, TId v){
         // Remove the reverse edge v, u.
         if(g -> directed){
     
-            TNodeList *reverse_cur = edge(g, v, u, 1);
+            TNodeList * reverse_cur = edge(g, v, u, 1);
         
             if(reverse_cur == NULL){
                 if(g -> vertices[v].reverse != NULL 
@@ -193,7 +193,7 @@ int disconnect(TGraph *g, TId u, TId v){
         
             if(reverse_cur != NULL){
                 if(reverse_cur -> next != NULL){
-                    TNodeList *del = reverse_cur -> next;
+                    TNodeList * del = reverse_cur -> next;
                     reverse_cur -> next = reverse_cur -> next -> next;
                     free(del);
                     del = reverse_cur = NULL;
@@ -206,7 +206,7 @@ int disconnect(TGraph *g, TId u, TId v){
         // Remove the direct edge v, u.
         else{
 
-            TNodeList *reverse_cur = edge(g, v, u, 0);
+            TNodeList * reverse_cur = edge(g, v, u, 0);
 
             if(reverse_cur == NULL){
                 if(g -> vertices[v].direct != NULL 
@@ -218,7 +218,7 @@ int disconnect(TGraph *g, TId u, TId v){
 
             if(reverse_cur != NULL){
                 if(reverse_cur -> next != NULL){
-                    TNodeList *reverse_del = reverse_cur -> next;
+                    TNodeList * reverse_del = reverse_cur -> next;
                     reverse_cur -> next = reverse_cur -> next -> next;
                     free(reverse_del);
                     reverse_del = reverse_cur = NULL;
@@ -233,11 +233,11 @@ int disconnect(TGraph *g, TId u, TId v){
     return 1;
 }
 
-const TEdge * connect(TGraph *g, TId u, TId v) {
+const TEdge * connect(TGraph * g, TId u, TId v) {
     return connectWeight(g, u, v, 0, NULL);
 }
 
-const TEdge * connectWeight(TGraph *g, TId u, TId v, TWeight weight, char *label){
+const TEdge * connectWeight(TGraph * g, TId u, TId v, TWeight weight, char * label){
 
     if(isInvalid(g, u, v))
         return NULL;
@@ -245,10 +245,10 @@ const TEdge * connectWeight(TGraph *g, TId u, TId v, TWeight weight, char *label
     else{
         
         // Add the direct edge u, v.
-        TNodeList *cur = (TNodeList *) malloc (sizeof(TNodeList));
+        TNodeList * cur = (TNodeList *) malloc (sizeof(TNodeList));
         fillNodeList(cur, v, weight, label);
         
-        TNodeList *ref = g -> vertices[u].direct;
+        TNodeList * ref = g -> vertices[u].direct;
         cur -> next = ref;
         
         g -> vertices[u].direct = cur;
@@ -257,10 +257,10 @@ const TEdge * connectWeight(TGraph *g, TId u, TId v, TWeight weight, char *label
         // Add the reverse edge v, u.
         if(g -> directed){
 
-            TNodeList *reverse_cur = (TNodeList *) malloc (sizeof(TNodeList));        
+            TNodeList * reverse_cur = (TNodeList *) malloc (sizeof(TNodeList));        
             fillNodeList(reverse_cur, u, weight, label);
             
-            TNodeList *reverse_ref = g -> vertices[v].reverse;  
+            TNodeList * reverse_ref = g -> vertices[v].reverse;  
             reverse_cur -> next = reverse_ref;
             
             g -> vertices[v].reverse = reverse_cur;  
@@ -270,10 +270,10 @@ const TEdge * connectWeight(TGraph *g, TId u, TId v, TWeight weight, char *label
         // Add the direct edge v, u.
         else{
             
-            TNodeList *reverse_cur = (TNodeList *) malloc (sizeof(TNodeList));     
+            TNodeList * reverse_cur = (TNodeList *) malloc (sizeof(TNodeList));     
             fillNodeList(reverse_cur, u, weight, label);
             
-            TNodeList *reverse_ref = g -> vertices[v].direct;
+            TNodeList * reverse_ref = g -> vertices[v].direct;
             reverse_cur -> next = reverse_ref;
 
             g -> vertices[v].direct = reverse_cur;       
@@ -284,7 +284,7 @@ const TEdge * connectWeight(TGraph *g, TId u, TId v, TWeight weight, char *label
     }
 }
 
-TEdge * changeWeight(TGraph *g, TId u, TId v, TWeight weight, char *label){
+TEdge * changeWeight(TGraph * g, TId u, TId v, TWeight weight, char * label){
     
     if(isInvalid(g, u, v))
         return NULL;
@@ -292,7 +292,7 @@ TEdge * changeWeight(TGraph *g, TId u, TId v, TWeight weight, char *label){
     else{
         
         // Change the weight of direct edge u, v.
-        TNodeList *cur = edge(g, u, v, 0);
+        TNodeList * cur = edge(g, u, v, 0);
         
         if(cur == NULL && g -> vertices[u].direct != NULL 
         && g -> vertices[u].direct -> edge.destination == v){
@@ -308,7 +308,7 @@ TEdge * changeWeight(TGraph *g, TId u, TId v, TWeight weight, char *label){
         // Change the weight of reverse edge v, u.
         if(g -> directed){
         
-            TNodeList *reverse_cur = edge(g, v, u, 1);
+            TNodeList * reverse_cur = edge(g, v, u, 1);
             
             if(reverse_cur == NULL && g -> vertices[v].reverse != NULL 
             && g -> vertices[v].reverse -> edge.destination == u){
@@ -325,7 +325,7 @@ TEdge * changeWeight(TGraph *g, TId u, TId v, TWeight weight, char *label){
         // Chance the weight of direct edge v, u.
         else{
             
-            TNodeList *reverse_cur = edge(g, v, u, 0);
+            TNodeList * reverse_cur = edge(g, v, u, 0);
             
             if(reverse_cur == NULL && g -> vertices[v].direct != NULL 
             && g -> vertices[v].direct -> edge.destination == u){
@@ -344,7 +344,7 @@ TEdge * changeWeight(TGraph *g, TId u, TId v, TWeight weight, char *label){
     return NULL;
 }
 
-void debugGraph(TGraph *g){
+void debugGraph(TGraph * g){
 
     if(g == NULL){
         printf("Null Graph.\n");
@@ -366,7 +366,7 @@ void debugGraph(TGraph *g){
         printf("\tweight: %lf\n", g -> vertices[i].weight);
         printf("\tList of direct edges: \n");
 
-        TNodeList *cur = g -> vertices[i].direct;
+        TNodeList * cur = g -> vertices[i].direct;
 
         while(cur != NULL){
             printf("\t\tEdge name: %s\n", cur -> edge.label);

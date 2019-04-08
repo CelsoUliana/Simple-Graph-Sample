@@ -20,7 +20,7 @@ Find the minimum degree of the graph and list all vertices
 with the minimum degree.
 If graph is directed, consider the sum of exit and entry degrees.
 */
-void findMinimumDegree(const TGraph *g, FILE *handler) {
+void findMinimumDegree(const TGraph * g, FILE * handler) {
     // Initialize the degree with a number too big 
     // (none vertex is neighbor to all). If graph is directed can be an edge
     // exiting and other arriving at each vertex. 
@@ -54,7 +54,7 @@ Find the maximum degree of the graph and list all vertices
 with the maximum degree.
 If graph is directed, consider the sum of exit and entry degrees.
 */
-void findMaximumDegree(const TGraph *g, FILE *handler) {
+void findMaximumDegree(const TGraph * g, FILE * handler) {
     // Initialize the degree with a number too low (the minimum).
     // If graph is directed can be an edge
     // exiting and other arriving at each vertex. 
@@ -83,7 +83,7 @@ void findMaximumDegree(const TGraph *g, FILE *handler) {
 }
 
 // Print message of use, when there is a problem in args.
-void printUse(char **argv) {
+void printUse(char ** argv) {
     fprintf(stderr, "\nUsage: %s command input.gr [output.gr]\n", argv[0]);
     fprintf(stderr, "Commands:\n\tcopy      : Copy the input graph to output.\n"
 	  "\tdraw      : generate a draw of the graph in format dot in exit file.\n"
@@ -91,7 +91,7 @@ void printUse(char **argv) {
 	  "\tmindegree : print the vertices with the minumum degree.\n");
 }
 
-int main (int argc, char **argv) {
+int main (int argc, char ** argv) {
 
     if (argc < 3) {
         printUse(argv);
@@ -99,7 +99,7 @@ int main (int argc, char **argv) {
     }
 
     // Command string typed by user.
-    char *scommand = argv[1];
+    char * scommand = argv[1];
     int command = UNKNOWN;
 
     // Identify the known commands.
@@ -127,14 +127,14 @@ int main (int argc, char **argv) {
     }
 
     // Open the input file for reading.
-    FILE *input = fopen(argv[2], "r");
+    FILE * input = fopen(argv[2], "r");
     if (input == NULL) {
         fprintf(stderr, "Failure to open input file. %s .\n", argv[2]);
         return 2;
     }
 
     // Read the entry graph in DIMACS format.
-    TGraph *g = NULL;
+    TGraph * g = NULL;
     int res;
     g = readGraphDimacs(g, input);
     fclose(input);
@@ -145,7 +145,7 @@ int main (int argc, char **argv) {
     }
 
     // Open output file, if necessary.
-    FILE *output;
+    FILE * output;
     if (command == COPY || command == DRAW) {
         output = fopen(argv[3], "w");
         if (output == NULL) {

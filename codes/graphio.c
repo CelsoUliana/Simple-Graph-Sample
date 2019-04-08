@@ -2,13 +2,13 @@
 **   Celso Antonio Uliana Junior,
 **   April 2019
 */
-#include "graphio.h"
 #include <string.h>
 #include <stdlib.h>
+#include "graphio.h"
 
-TGraph * readGraphDimacs(TGraph *g, FILE* handler){
+TGraph * readGraphDimacs(TGraph * g, FILE * handler){
     int n, m, dir, flag = 0;
-    char d, *p = (char*) malloc (255 * sizeof(char));;
+    char d, * p = (char *) malloc (255 * sizeof(char));;
     
     fscanf(handler, "%c %c %d %d %s\n", &d, &d, &n, &m, p);
     
@@ -22,7 +22,7 @@ TGraph * readGraphDimacs(TGraph *g, FILE* handler){
     for(int i = 0; i < n; i++){
         int aux = 0;
         double weight = 0;
-        char c, *label = (char*) malloc(255 * sizeof(char));;
+        char c, * label = (char *) malloc(255 * sizeof(char));;
         
         fscanf(handler, "%c %d %lf %s\n", &c, &aux, &weight, label);
         g -> vertices[i].weight = weight;
@@ -31,7 +31,7 @@ TGraph * readGraphDimacs(TGraph *g, FILE* handler){
     
     for(int i = 0; i < m; i++){
         int u, v;
-        char c, *label = (char*) malloc(255 * sizeof(char));
+        char c, * label = (char *) malloc(255 * sizeof(char));
         double weight = 0;
         
         fscanf(handler, "%c %d %d %f %s\n", &c, &u, &v, &weight, label);
@@ -41,9 +41,9 @@ TGraph * readGraphDimacs(TGraph *g, FILE* handler){
     return g;
 }
 
-TGraph * debugReadGraphDimacs(TGraph *g){
+TGraph * debugReadGraphDimacs(TGraph * g){
     int n, m, dir;
-    char d, *p = (char*) malloc (255 * sizeof(char));;
+    char d, * p = (char *) malloc (255 * sizeof(char));;
     
     scanf("%c %c %d %d %s\n", &d, &d, &n, &m, p);
     
@@ -57,7 +57,7 @@ TGraph * debugReadGraphDimacs(TGraph *g){
     for(int i = 0; i < n; i++){
         int aux = 0;
         double weight = 0;
-        char c, *label = (char*) malloc(255 * sizeof(char));;
+        char c, * label = (char *) malloc(255 * sizeof(char));;
         
         scanf("%c %d %lf %s\n", &c, &aux, &weight, label);
         g -> vertices[i].weight = weight;
@@ -66,7 +66,7 @@ TGraph * debugReadGraphDimacs(TGraph *g){
     
     for(int i = 0; i < m; i++){
         int u, v;
-        char c, *label = (char*) malloc(255 * sizeof(char));
+        char c, * label = (char *) malloc(255 * sizeof(char));
         double weight = 0;
         
         scanf("%c %d %d %f %s\n", &c, &u, &v, &weight, label);
@@ -76,7 +76,7 @@ TGraph * debugReadGraphDimacs(TGraph *g){
     return g;
 }
 
-int saveGraphDimacs(const TGraph *g, FILE* handler){  
+int saveGraphDimacs(const TGraph * g, FILE * handler){  
     char dir = g -> directed == 1 ? 'D' : 'U' ;
     int i;
     
@@ -93,27 +93,27 @@ int saveGraphDimacs(const TGraph *g, FILE* handler){
         memset(vis, 0, sizeof vis); 
         
         for(i = 0; i < g -> n; i++){
-            TNodeList *aux = g -> vertices[i].direct;
+            TNodeList * cur = g -> vertices[i].direct;
 
-            while(aux != NULL){
+            while(cur != NULL){
 
                 if(g -> directed){
-                    if(!vis[i][aux -> edge.destination]){
+                    if(!vis[i][cur -> edge.destination]){
                         fprintf(handler, "E %d %d %lf %s\n", 
-                        i, aux -> edge.destination, aux -> edge.weight, aux -> edge.label);
-                        vis[i][aux -> edge.destination] = 1;
+                        i, cur -> edge.destination, cur -> edge.weight, cur -> edge.label);
+                        vis[i][cur -> edge.destination] = 1;
                     }
                 }
                 
                 else{
-                    if(!vis[i][aux -> edge.destination] || !vis[aux -> edge.destination][i]){
+                    if(!vis[i][cur -> edge.destination] || !vis[cur -> edge.destination][i]){
                         fprintf(handler, "E %d %d %lf %s\n", 
-                        i, aux -> edge.destination, aux -> edge.weight, aux -> edge.label);
-                        vis[i][aux -> edge.destination] = vis[aux -> edge.destination][i] = 1;
+                        i, cur -> edge.destination, cur -> edge.weight, cur -> edge.label);
+                        vis[i][cur -> edge.destination] = vis[cur -> edge.destination][i] = 1;
                     }
                 }
                 
-                aux = aux -> next;
+                cur = cur -> next;
             }
         }
     }
@@ -121,7 +121,7 @@ int saveGraphDimacs(const TGraph *g, FILE* handler){
     return 1;
 }
 
-int debugSaveGraphDimacs(const TGraph *g){  
+int debugSaveGraphDimacs(const TGraph * g){  
     char dir = g -> directed == 1 ? 'D' : 'U' ;
     int i;
     
@@ -138,27 +138,27 @@ int debugSaveGraphDimacs(const TGraph *g){
         memset(vis, 0, sizeof vis); 
         
         for(i = 0; i < g -> n; i++){
-            TNodeList *aux = g -> vertices[i].direct;
+            TNodeList * cur = g -> vertices[i].direct;
             
-            while(aux != NULL){
+            while(cur != NULL){
 
                 if(g -> directed){
-                    if(!vis[i][aux -> edge.destination]){
-                        printf("E %d %d %lf %s\n", i, aux -> edge.destination, 
-                        aux -> edge.weight, aux -> edge.label);
-                        vis[i][aux -> edge.destination] = 1;
+                    if(!vis[i][cur -> edge.destination]){
+                        printf("E %d %d %lf %s\n", i, cur -> edge.destination, 
+                        cur -> edge.weight, cur -> edge.label);
+                        vis[i][cur -> edge.destination] = 1;
                     }
                 }
                 
                 else{
-                    if(!vis[i][aux -> edge.destination] || !vis[aux -> edge.destination][i]){
-                        printf("E %d %d %lf %s\n", i, aux -> edge.destination, 
-                        aux -> edge.weight, aux -> edge.label);
-                        vis[i][aux -> edge.destination] = vis[aux -> edge.destination][i] = 1;
+                    if(!vis[i][cur -> edge.destination] || !vis[cur -> edge.destination][i]){
+                        printf("E %d %d %lf %s\n", i, cur -> edge.destination, 
+                        cur -> edge.weight, cur -> edge.label);
+                        vis[i][cur -> edge.destination] = vis[cur -> edge.destination][i] = 1;
                     }
                 }
                 
-                aux = aux -> next;
+                cur = cur -> next;
             }
             
         }
@@ -167,7 +167,7 @@ int debugSaveGraphDimacs(const TGraph *g){
     return 1;
 }
 
-int saveGraphDot(const TGraph *g, FILE* handler){
+int saveGraphDot(const TGraph * g, FILE * handler){
     
     if(g -> directed)
         fprintf(handler, "digraph %s {\n", g -> name);
@@ -188,27 +188,27 @@ int saveGraphDot(const TGraph *g, FILE* handler){
     memset(vis, 0, sizeof vis); 
         
     for(int i = 0; i < g -> n; i++){
-        TNodeList *aux = g -> vertices[i].direct;
+        TNodeList * cur = g -> vertices[i].direct;
             
-        while(aux != NULL){
+        while(cur != NULL){
             
             if(g -> directed){
-                if(!vis[i][aux -> edge.destination]){
+                if(!vis[i][cur -> edge.destination]){
                     fprintf(handler, " V%d -> V%d [label=\"%s\\n%lf\"]\n",
-                     i, aux -> edge.destination, aux -> edge.label, aux -> edge.weight);
-                    vis[i][aux -> edge.destination] = 1;
+                     i, cur -> edge.destination, cur -> edge.label, cur -> edge.weight);
+                    vis[i][cur -> edge.destination] = 1;
                 }
             }
             
             else{
-                if(!vis[i][aux -> edge.destination] || !vis[aux -> edge.destination][i]){
+                if(!vis[i][cur -> edge.destination] || !vis[cur -> edge.destination][i]){
                     fprintf(handler, " V%d -- V%d [label=\"%s\\n%lf\"]\n",
-                     i, aux -> edge.destination, aux -> edge.label, aux -> edge.weight);
-                    vis[i][aux -> edge.destination] = vis[aux -> edge.destination][i] = 1;
+                     i, cur -> edge.destination, cur -> edge.label, cur -> edge.weight);
+                    vis[i][cur -> edge.destination] = vis[cur -> edge.destination][i] = 1;
                 }
             }
                 
-            aux = aux -> next;
+            cur = cur -> next;
         }     
     }
     
@@ -217,7 +217,7 @@ int saveGraphDot(const TGraph *g, FILE* handler){
     return 1;
 }
 
-int debugSaveGraphDot(const TGraph *g){
+int debugSaveGraphDot(const TGraph * g){
     
     if(g -> directed)
         printf("digraph %s {\n", g -> name);
@@ -237,27 +237,27 @@ int debugSaveGraphDot(const TGraph *g){
     memset(vis, 0, sizeof vis); 
         
     for(int i = 0; i < g -> n; i++){
-        TNodeList *aux = g -> vertices[i].direct;
+        TNodeList * cur = g -> vertices[i].direct;
             
-        while(aux != NULL){
+        while(cur != NULL){
             
             if(g -> directed){
-                if(!vis[i][aux -> edge.destination]){
+                if(!vis[i][cur -> edge.destination]){
                     printf(" V%d -> V%d [label=\"%s\\n%lf\"]\n",
-                    i, aux -> edge.destination, aux -> edge.label, aux -> edge.weight);
-                    vis[i][aux -> edge.destination] = 1;
+                    i, cur -> edge.destination, cur -> edge.label, cur -> edge.weight);
+                    vis[i][cur -> edge.destination] = 1;
                 }
             }
             
             else{
-                if(!vis[i][aux -> edge.destination] || !vis[aux -> edge.destination][i]){
+                if(!vis[i][cur -> edge.destination] || !vis[cur -> edge.destination][i]){
                     printf(" V%d -- V%d [label=\"%s\\n%lf\"]\n",
-                    i, aux -> edge.destination, aux -> edge.label, aux -> edge.weight);
-                    vis[i][aux -> edge.destination] = vis[aux -> edge.destination][i] = 1;
+                    i, cur -> edge.destination, cur -> edge.label, cur -> edge.weight);
+                    vis[i][cur -> edge.destination] = vis[cur -> edge.destination][i] = 1;
                 }
             }
                 
-            aux = aux -> next;
+            cur = cur -> next;
         }    
     }
     

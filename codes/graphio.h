@@ -14,24 +14,24 @@
 // It will be initialized for the size obtained in the file.
 //      - A NULL pointer, in whick case the graph will be
 // Created and returned.
-TGraph * readGraphDimacs(TGraph *g, FILE* handler);
+TGraph * readGraphDimacs(TGraph * g, FILE* handler);
 
 // Auxiliary function to debug readGraphDimacs(...) in console.
 // In witch case the correct arguments must be suplied in console.
-TGraph * debugReadGraphDimacs(TGraph *g);
+TGraph * debugReadGraphDimacs(TGraph * g);
 
 // Save a graph in format DIMACS, returns 1 if success or 0 if failure.
-int saveGraphDimacs(const TGraph *g, FILE* handler);
+int saveGraphDimacs(const TGraph * g, FILE * handler);
 
 // Auxiliary function to debug the export to dimacs format in console.
-int debugSaveGraphDimacs(const TGraph *g);
+int debugSaveGraphDimacs(const TGraph * g);
 
 // Save a graph in dot format, return 1 if success or 0 if failure.
 // For now only works in undirected graph(?)
-int saveGraphDot(const TGraph *g, FILE* handler);
+int saveGraphDot(const TGraph * g, FILE * handler);
 
 // Auxiliary function to debug the export to dot format in console.
 // For now only works in undirected graph(?)
-int debugSaveGraphDot(const TGraph *g);
+int debugSaveGraphDot(const TGraph * g);
 
 #endif

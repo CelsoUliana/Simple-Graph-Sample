@@ -3,7 +3,8 @@ A simple graph sample implementation in C.
 
 Used for academy purposes.
 
-Compile:
+
+Compile or make:
 
 ```
 gcc -c -g -o main.o main.c
