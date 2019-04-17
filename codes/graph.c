@@ -2,8 +2,6 @@
 **   Celso Antonio Uliana Junior,
 **   April 2019
 */
-#include <stdlib.h>
-#include <stdio.h>
 #include "graph.h"
 
 TId countEdges(const TGraph * g) {

@@ -5,7 +5,6 @@
 #ifndef _GRAPH_IO_H
 #define _GRAPH_IO_H
 
-#include <stdio.h>
 #include "graph.h"
 
 // Read a graph in DIMACS format.

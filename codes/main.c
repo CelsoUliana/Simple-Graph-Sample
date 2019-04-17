@@ -2,9 +2,6 @@
 **   Celso Antonio Uliana Junior,
 **   April 2019
 */
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include "graphio.h"
 
 enum COMMANDS {

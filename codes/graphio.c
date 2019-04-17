@@ -2,8 +2,6 @@
 **   Celso Antonio Uliana Junior,
 **   April 2019
 */
-#include <string.h>
-#include <stdlib.h>
 #include "graphio.h"
 
 TGraph * readGraphDimacs(TGraph * g, FILE * handler){

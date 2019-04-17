@@ -5,6 +5,10 @@
 #ifndef _GRAPH_H
 #define _GRAPH_H
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
 typedef int TId;
 typedef double TWeight;
 
