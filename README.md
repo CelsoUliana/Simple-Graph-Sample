@@ -1,8 +1,8 @@
 # Simple-Graph-Sample
 A simple graph sample implementation in C.
 
-Used for academy purposes.
-
+Can be used for simple imports in .gr format(dot) and simple exports .viz(graphviz) or copy (dot).
+Can also be used for getting degrees or min distance.
 
 Compile or make:
 
@@ -20,6 +20,3 @@ gcc -o prim *.o
 Run:
 
 ```./prim [Command]```
-
-
-Sample structure and usage provided by teacher Vagner Pedrotti.
